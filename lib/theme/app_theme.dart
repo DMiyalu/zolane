@@ -31,10 +31,10 @@ class AppTheme {
         error: errorColor,
         background: backgroundColor,
       ),
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(cardRadius),
+          borderRadius: BorderRadius.all(Radius.circular(cardRadius)),
         ),
         color: cardColor,
         margin: EdgeInsets.zero,
@@ -139,4 +139,3 @@ class AppTheme {
     );
   }
 }
-
