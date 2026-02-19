@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "510072287638",
+    "project_id": "zolane-50c21",
+    "storage_bucket": "zolane-50c21.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:510072287638:android:e9d7aaa298c7c2076f2db7",
+        "android_client_info": {
+          "package_name": "com.zolane.zolane"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3q7nOHDrk_-F7eUUrjU3wtPU1D6DIaDA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

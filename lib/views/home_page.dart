@@ -18,67 +18,68 @@ class HomePage extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: AppTheme.cardColor,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppTheme.cardRadius),
-          ),
-        ),
-        padding: const EdgeInsets.all(AppTheme.padding),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: AppTheme.padding),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: AppTheme.cardColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppTheme.cardRadius),
               ),
             ),
-            _buildMenuOption(
-              context,
-              icon: Icons.add_circle_outline,
-              title: 'Nouvelle entrée',
-              subtitle: 'Ajouter une recette',
-              color: AppTheme.successColor,
-              onTap: () {
-                Navigator.of(context).pop();
-                Future.delayed(const Duration(milliseconds: 200), () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => const AddEntryForm(),
-                  );
-                });
-              },
+            padding: const EdgeInsets.all(AppTheme.padding),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: AppTheme.padding),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.add_circle_outline,
+                  title: 'Nouvelle entrée',
+                  subtitle: 'Ajouter une recette',
+                  color: AppTheme.successColor,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Future.delayed(const Duration(milliseconds: 200), () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const AddEntryForm(),
+                      );
+                    });
+                  },
+                ),
+                const SizedBox(height: AppTheme.smallPadding),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.remove_circle_outline,
+                  title: 'Nouvelle dépense',
+                  subtitle: 'Ajouter une sortie',
+                  color: AppTheme.errorColor,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Future.delayed(const Duration(milliseconds: 200), () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const AddExpenseForm(),
+                      );
+                    });
+                  },
+                ),
+                const SizedBox(height: AppTheme.padding),
+              ],
             ),
-            const SizedBox(height: AppTheme.smallPadding),
-            _buildMenuOption(
-              context,
-              icon: Icons.remove_circle_outline,
-              title: 'Nouvelle dépense',
-              subtitle: 'Ajouter une sortie',
-              color: AppTheme.errorColor,
-              onTap: () {
-                Navigator.of(context).pop();
-                Future.delayed(const Duration(milliseconds: 200), () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => const AddExpenseForm(),
-                  );
-                });
-              },
-            ),
-            const SizedBox(height: AppTheme.padding),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -100,10 +101,7 @@ class HomePage extends StatelessWidget {
           decoration: BoxDecoration(
             color: color.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: color.withOpacity(0.2),
-              width: 1,
-            ),
+            border: Border.all(color: color.withOpacity(0.2), width: 1),
           ),
           child: Row(
             children: [
@@ -120,10 +118,7 @@ class HomePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+                    Text(title, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
@@ -132,10 +127,7 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: Colors.grey.shade400,
-              ),
+              Icon(Icons.chevron_right, color: Colors.grey.shade400),
             ],
           ),
         ),
@@ -165,9 +157,7 @@ class HomePage extends StatelessWidget {
               icon: const Icon(Icons.person_outline),
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilePage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
                 );
               },
             ),
@@ -239,6 +229,7 @@ class HomePage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _showAddMenu(context),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
@@ -247,4 +238,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-

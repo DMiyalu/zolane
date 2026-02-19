@@ -49,6 +49,23 @@ dependencies:
   # Image picker
   image_picker: ^1.0.7
 
+  # Firebase (cloud)
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.7.0
+  cloud_firestore: ^5.6.12
+  google_sign_in: ^6.3.0
+
+  # Local database (SQLite)
+  sqflite: ^2.4.2
+  path: ^1.9.0
+  path_provider: ^2.1.5
+
+  # Connectivity (sync trigger)
+  connectivity_plus: ^6.1.3
+
+  # IDs
+  uuid: ^4.5.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

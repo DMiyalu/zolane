@@ -29,67 +29,68 @@ class _WalletPageState extends State<WalletPage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: AppTheme.cardColor,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppTheme.cardRadius),
-          ),
-        ),
-        padding: const EdgeInsets.all(AppTheme.padding),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: AppTheme.padding),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: AppTheme.cardColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppTheme.cardRadius),
               ),
             ),
-            _buildMenuOption(
-              context,
-              icon: Icons.add_circle_outline,
-              title: 'Nouvelle entrée',
-              subtitle: 'Ajouter une recette',
-              color: AppTheme.successColor,
-              onTap: () {
-                Navigator.of(context).pop();
-                Future.delayed(const Duration(milliseconds: 200), () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => const AddEntryForm(),
-                  );
-                });
-              },
+            padding: const EdgeInsets.all(AppTheme.padding),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: AppTheme.padding),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.add_circle_outline,
+                  title: 'Nouvelle entrée',
+                  subtitle: 'Ajouter une recette',
+                  color: AppTheme.successColor,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Future.delayed(const Duration(milliseconds: 200), () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const AddEntryForm(),
+                      );
+                    });
+                  },
+                ),
+                const SizedBox(height: AppTheme.smallPadding),
+                _buildMenuOption(
+                  context,
+                  icon: Icons.remove_circle_outline,
+                  title: 'Nouvelle dépense',
+                  subtitle: 'Ajouter une sortie',
+                  color: AppTheme.errorColor,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Future.delayed(const Duration(milliseconds: 200), () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => const AddExpenseForm(),
+                      );
+                    });
+                  },
+                ),
+                const SizedBox(height: AppTheme.padding),
+              ],
             ),
-            const SizedBox(height: AppTheme.smallPadding),
-            _buildMenuOption(
-              context,
-              icon: Icons.remove_circle_outline,
-              title: 'Nouvelle dépense',
-              subtitle: 'Ajouter une sortie',
-              color: AppTheme.errorColor,
-              onTap: () {
-                Navigator.of(context).pop();
-                Future.delayed(const Duration(milliseconds: 200), () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => const AddExpenseForm(),
-                  );
-                });
-              },
-            ),
-            const SizedBox(height: AppTheme.padding),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -111,10 +112,7 @@ class _WalletPageState extends State<WalletPage> {
           decoration: BoxDecoration(
             color: color.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: color.withOpacity(0.2),
-              width: 1,
-            ),
+            border: Border.all(color: color.withOpacity(0.2), width: 1),
           ),
           child: Row(
             children: [
@@ -131,10 +129,7 @@ class _WalletPageState extends State<WalletPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+                    Text(title, style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
@@ -143,10 +138,7 @@ class _WalletPageState extends State<WalletPage> {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: Colors.grey.shade400,
-              ),
+              Icon(Icons.chevron_right, color: Colors.grey.shade400),
             ],
           ),
         ),
@@ -157,17 +149,17 @@ class _WalletPageState extends State<WalletPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Portefeuille'),
-      ),
+      appBar: AppBar(title: const Text('Portefeuille')),
       body: BlocBuilder<WalletCubit, WalletStateData>(
         builder: (context, walletState) {
-          final entries = walletState.entries.toList()
-            ..sort((a, b) => b.date.compareTo(a.date));
-          final personalExpenses = walletState.expenses
-              .where((e) => e.type == ExpenseType.personnelle)
-              .toList()
-            ..sort((a, b) => b.date.compareTo(a.date));
+          final entries =
+              walletState.entries.toList()
+                ..sort((a, b) => b.date.compareTo(a.date));
+          final personalExpenses =
+              walletState.expenses
+                  .where((e) => e.type == ExpenseType.personnelle)
+                  .toList()
+                ..sort((a, b) => b.date.compareTo(a.date));
 
           return Column(
             children: [
@@ -191,27 +183,30 @@ class _WalletPageState extends State<WalletPage> {
                       child: _buildFilterButton(
                         'Entrées',
                         _currentFilter == WalletFilter.entries,
-                        () => setState(() => _currentFilter = WalletFilter.entries),
+                        () => setState(
+                          () => _currentFilter = WalletFilter.entries,
+                        ),
                       ),
                     ),
                     Expanded(
                       child: _buildFilterButton(
                         'Dépenses',
                         _currentFilter == WalletFilter.personalExpenses,
-                        () => setState(() => _currentFilter = WalletFilter.personalExpenses),
+                        () => setState(
+                          () => _currentFilter = WalletFilter.personalExpenses,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: _buildContent(entries, personalExpenses),
-              ),
+              Expanded(child: _buildContent(entries, personalExpenses)),
             ],
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _showAddMenu(context),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
@@ -238,16 +233,19 @@ class _WalletPageState extends State<WalletPage> {
             label,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isSelected ? Colors.white : const Color(0xFF6B7280),
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
+              color: isSelected ? Colors.white : const Color(0xFF6B7280),
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildContent(List<WalletEntry> entries, List<WalletExpense> personalExpenses) {
+  Widget _buildContent(
+    List<WalletEntry> entries,
+    List<WalletExpense> personalExpenses,
+  ) {
     if (_currentFilter == WalletFilter.entries) {
       if (entries.isEmpty) {
         return _buildEmptyState(
@@ -266,13 +264,15 @@ class _WalletPageState extends State<WalletPage> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          ...entries.map((entry) => OperationTile(
-                title: entry.note ?? entry.source.label,
-                subtitle: _getPropertyLabel(entry.property),
-                amount: entry.amount,
-                date: entry.date,
-                isPositive: true,
-              )),
+          ...entries.map(
+            (entry) => OperationTile(
+              title: entry.note ?? entry.source.label,
+              subtitle: _getPropertyLabel(entry.property),
+              amount: entry.amount,
+              date: entry.date,
+              isPositive: true,
+            ),
+          ),
           const SizedBox(height: AppTheme.padding),
         ],
       );
@@ -294,13 +294,16 @@ class _WalletPageState extends State<WalletPage> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          ...personalExpenses.map((expense) => OperationTile(
-                title: expense.note ??
-                    (expense.personalReason?.label ?? 'Dépense personnelle'),
-                amount: expense.amount,
-                date: expense.date,
-                isPositive: false,
-              )),
+          ...personalExpenses.map(
+            (expense) => OperationTile(
+              title:
+                  expense.note ??
+                  (expense.personalReason?.label ?? 'Dépense personnelle'),
+              amount: expense.amount,
+              date: expense.date,
+              isPositive: false,
+            ),
+          ),
           const SizedBox(height: AppTheme.padding),
         ],
       );
@@ -323,13 +326,15 @@ class _WalletPageState extends State<WalletPage> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            ...entries.map((entry) => OperationTile(
-                  title: entry.note ?? entry.source.label,
-                  subtitle: _getPropertyLabel(entry.property),
-                  amount: entry.amount,
-                  date: entry.date,
-                  isPositive: true,
-                )),
+            ...entries.map(
+              (entry) => OperationTile(
+                title: entry.note ?? entry.source.label,
+                subtitle: _getPropertyLabel(entry.property),
+                amount: entry.amount,
+                date: entry.date,
+                isPositive: true,
+              ),
+            ),
             const SizedBox(height: AppTheme.padding * 1.5),
           ],
           if (personalExpenses.isNotEmpty) ...[
@@ -340,14 +345,16 @@ class _WalletPageState extends State<WalletPage> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            ...personalExpenses.map((expense) => OperationTile(
-                  title: expense.note ??
-                      (expense.personalReason?.label ??
-                          'Dépense personnelle'),
-                  amount: expense.amount,
-                  date: expense.date,
-                  isPositive: false,
-                )),
+            ...personalExpenses.map(
+              (expense) => OperationTile(
+                title:
+                    expense.note ??
+                    (expense.personalReason?.label ?? 'Dépense personnelle'),
+                amount: expense.amount,
+                date: expense.date,
+                isPositive: false,
+              ),
+            ),
           ],
           const SizedBox(height: AppTheme.padding),
         ],
@@ -372,26 +379,22 @@ class _WalletPageState extends State<WalletPage> {
                 color: AppTheme.backgroundColor,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 64,
-                color: Colors.grey.shade300,
-              ),
+              child: Icon(icon, size: 64, color: Colors.grey.shade300),
             ),
             const SizedBox(height: AppTheme.padding * 1.5),
             Text(
               message,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: const Color(0xFF374151),
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: const Color(0xFF374151)),
             ),
             const SizedBox(height: AppTheme.smallPadding),
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF9CA3AF),
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF9CA3AF)),
             ),
           ],
         ),
@@ -399,4 +402,3 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 }
-
