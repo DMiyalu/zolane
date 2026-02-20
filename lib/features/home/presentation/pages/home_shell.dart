@@ -5,6 +5,7 @@ import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../properties/data/repositories/properties_repository_impl.dart';
 import '../../../properties/domain/entities/property.dart';
+import '../../../properties/presentation/pages/property_detail_page.dart';
 import '../../../properties/presentation/cubit/properties_cubit.dart';
 import '../../../properties/presentation/widgets/property_form_sheet.dart';
 
@@ -72,6 +73,7 @@ class _HomeShellView extends StatelessWidget {
                     )
                   : _PropertiesList(
                       properties: properties,
+                      onOpen: (p) => _openDetail(context, p),
                       onEdit: (p) => _openEdit(context, p),
                       onDelete: (p) =>
                           context.read<PropertiesCubit>().delete(p.id),
@@ -106,6 +108,14 @@ class _HomeShellView extends StatelessWidget {
           address: result.address,
           note: result.note,
         );
+  }
+
+  static void _openDetail(BuildContext context, Property property) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PropertyDetailPage(property: property),
+      ),
+    );
   }
 }
 
@@ -161,11 +171,13 @@ class _EmptyState extends StatelessWidget {
 
 class _PropertiesList extends StatelessWidget {
   final List<Property> properties;
+  final ValueChanged<Property> onOpen;
   final ValueChanged<Property> onEdit;
   final ValueChanged<Property> onDelete;
 
   const _PropertiesList({
     required this.properties,
+    required this.onOpen,
     required this.onEdit,
     required this.onDelete,
   });
@@ -219,8 +231,12 @@ class _PropertiesList extends StatelessWidget {
             child: ListTile(
               title: Text(p.label),
               subtitle: Text('${p.city} • ${p.address}'),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => onEdit(p),
+              trailing: IconButton(
+                tooltip: 'Modifier',
+                onPressed: () => onEdit(p),
+                icon: const Icon(Icons.edit_outlined),
+              ),
+              onTap: () => onOpen(p),
             ),
           ),
         );
