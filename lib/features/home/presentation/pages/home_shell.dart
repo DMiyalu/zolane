@@ -8,6 +8,7 @@ import '../../../properties/domain/entities/property.dart';
 import '../../../properties/presentation/pages/property_detail_page.dart';
 import '../../../properties/presentation/cubit/properties_cubit.dart';
 import '../../../properties/presentation/widgets/property_form_sheet.dart';
+import '../../../sync/sync_runner.dart';
 
 class HomeShell extends StatelessWidget {
   final AppUser user;
@@ -18,13 +19,15 @@ class HomeShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PropertiesCubit(PropertiesRepositoryImpl())..load(),
-      child: const _HomeShellView(),
+      child: _HomeShellView(uid: user.uid),
     );
   }
 }
 
 class _HomeShellView extends StatelessWidget {
-  const _HomeShellView();
+  final String uid;
+
+  const _HomeShellView({required this.uid});
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +84,7 @@ class _HomeShellView extends StatelessWidget {
             };
           },
         ),
+        bottomNavigationBar: SyncRunner(uid: uid),
       ),
     );
   }

@@ -82,6 +82,19 @@ class _PropertyDetailView extends StatelessWidget {
                               property.address,
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
+                            const SizedBox(height: 12),
+                            BlocBuilder<OperationsCubit, OperationsState>(
+                              builder: (context, state) {
+                                final ops = switch (state) {
+                                  OperationsStateLoaded(:final operations) =>
+                                    operations,
+                                  _ => const <Operation>[],
+                                };
+
+                                final totals = _Totals.fromOperations(ops);
+                                return _TotalsRow(totals: totals);
+                              },
+                            ),
                             if ((property.note ?? '').trim().isNotEmpty) ...[
                               const SizedBox(height: 8),
                               Text(
@@ -266,5 +279,116 @@ class _OperationTile extends StatelessWidget {
     final mm = d.month.toString().padLeft(2, '0');
     final yyyy = d.year.toString();
     return '$dd/$mm/$yyyy';
+  }
+}
+
+class _Totals {
+  final int incomeCents;
+  final int expenseCents;
+
+  const _Totals({required this.incomeCents, required this.expenseCents});
+
+  int get balanceCents => incomeCents - expenseCents;
+
+  static _Totals fromOperations(List<Operation> operations) {
+    var inCents = 0;
+    var outCents = 0;
+
+    for (final op in operations) {
+      if (op.kind == OperationKind.income) {
+        inCents += op.amountCents;
+      } else {
+        outCents += op.amountCents;
+      }
+    }
+
+    return _Totals(incomeCents: inCents, expenseCents: outCents);
+  }
+}
+
+class _TotalsRow extends StatelessWidget {
+  final _Totals totals;
+
+  const _TotalsRow({required this.totals});
+
+  @override
+  Widget build(BuildContext context) {
+    final inText = _formatEuros(totals.incomeCents);
+    final outText = _formatEuros(totals.expenseCents);
+    final balText = _formatEuros(totals.balanceCents);
+
+    final balanceColor = totals.balanceCents >= 0
+        ? AppTheme.successColor
+        : AppTheme.errorColor;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _MetricChip(
+            label: 'Revenus',
+            value: '+$inText',
+            valueColor: AppTheme.successColor,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _MetricChip(
+            label: 'Dépenses',
+            value: '-$outText',
+            valueColor: AppTheme.errorColor,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _MetricChip(
+            label: 'Balance',
+            value: balText,
+            valueColor: balanceColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  static String _formatEuros(int cents) {
+    final euros = (cents / 100).toStringAsFixed(2);
+    return '$euros €';
+  }
+}
+
+class _MetricChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color valueColor;
+
+  const _MetricChip({
+    required this.label,
+    required this.value,
+    required this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: valueColor,
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+        ],
+      ),
+    );
   }
 }

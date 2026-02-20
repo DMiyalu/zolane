@@ -20,6 +20,32 @@ class OperationsLocalDataSource {
     return rows.map(OperationModel.fromMap).toList(growable: false);
   }
 
+  Future<List<OperationModel>> getDirty() async {
+    final database = await _db();
+
+    final rows = await database.db.query(
+      'operations',
+      where: 'sync_status = ?',
+      whereArgs: [SyncStatus.dirty],
+      orderBy: 'updated_at_ms ASC',
+    );
+
+    return rows.map(OperationModel.fromMap).toList(growable: false);
+  }
+
+  Future<List<OperationModel>> getDeleted() async {
+    final database = await _db();
+
+    final rows = await database.db.query(
+      'operations',
+      where: 'sync_status = ?',
+      whereArgs: [SyncStatus.deleted],
+      orderBy: 'updated_at_ms ASC',
+    );
+
+    return rows.map(OperationModel.fromMap).toList(growable: false);
+  }
+
   Future<OperationModel?> getById(String id) async {
     final database = await _db();
 
@@ -44,6 +70,15 @@ class OperationsLocalDataSource {
     );
   }
 
+  Future<void> upsert(OperationModel model) async {
+    final database = await _db();
+    await database.db.insert(
+      'operations',
+      model.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   Future<void> update(OperationModel model) async {
     final database = await _db();
 
@@ -52,6 +87,20 @@ class OperationsLocalDataSource {
       model.toMap(),
       where: 'id = ?',
       whereArgs: [model.id],
+      conflictAlgorithm: ConflictAlgorithm.abort,
+    );
+  }
+
+  Future<void> markSynced({required String id, required int updatedAtMs}) async {
+    final database = await _db();
+    await database.db.update(
+      'operations',
+      {
+        'sync_status': SyncStatus.synced,
+        'updated_at_ms': updatedAtMs,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
       conflictAlgorithm: ConflictAlgorithm.abort,
     );
   }
@@ -68,6 +117,15 @@ class OperationsLocalDataSource {
       where: 'id = ?',
       whereArgs: [id],
       conflictAlgorithm: ConflictAlgorithm.abort,
+    );
+  }
+
+  Future<void> hardDelete(String id) async {
+    final database = await _db();
+    await database.db.delete(
+      'operations',
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 }

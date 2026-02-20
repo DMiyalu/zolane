@@ -52,7 +52,10 @@ class PropertiesRepositoryImpl implements PropertiesRepository {
     required String address,
     String? note,
   }) async {
-    final existing = (await _local.getAllActive()).firstWhere((p) => p.id == id);
+    final existing = await _local.getById(id);
+    if (existing == null) {
+      throw StateError('Property not found');
+    }
     final now = DateTime.now().millisecondsSinceEpoch;
 
     final updated = PropertyModel(

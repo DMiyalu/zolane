@@ -10,7 +10,7 @@ class AppDatabase {
   const AppDatabase._(this.db);
 
   static const _dbName = 'zolane.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   static Future<AppDatabase> open() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -20,6 +20,13 @@ class AppDatabase {
       path,
       version: _dbVersion,
       onCreate: (db, version) async {
+        await db.execute('''
+CREATE TABLE meta (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+''');
+
         await db.execute('''
 CREATE TABLE properties (
   id TEXT PRIMARY KEY,
@@ -48,6 +55,16 @@ CREATE TABLE operations (
   FOREIGN KEY(property_id) REFERENCES properties(id) ON DELETE CASCADE
 );
 ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
+CREATE TABLE meta (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+''');
+        }
       },
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
