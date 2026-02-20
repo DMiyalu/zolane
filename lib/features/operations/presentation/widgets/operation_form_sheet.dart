@@ -169,7 +169,8 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                key: ValueKey('category_${_kind.name}'),
+                initialValue: _selectedCategory,
                 decoration: const InputDecoration(labelText: 'Catégorie'),
                 items: _categoryItemsForCurrentKind()
                     .map(
@@ -199,7 +200,10 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
               const SizedBox(height: 12),
               if (showRentMonth) ...[
                 DropdownButtonFormField<DateTime>(
-                  value: _selectedRentMonth,
+                  key: ValueKey(
+                    'rentMonth_${_selectedRentMonth?.millisecondsSinceEpoch ?? 'null'}',
+                  ),
+                  initialValue: _selectedRentMonth,
                   decoration: const InputDecoration(labelText: 'Mois du loyer'),
                   items: _rentMonthOptions()
                       .map(

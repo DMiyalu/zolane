@@ -17,7 +17,21 @@ class OperationsRepositoryImpl implements OperationsRepository {
   @override
   Future<List<Operation>> getByProperty(String propertyId) async {
     final models = await _local.getByPropertyActive(propertyId);
-    return models.map((m) => m.toEntity()).toList(growable: false);
+    final operations = models
+        .map((m) => m.toEntity())
+        .toList(growable: true);
+
+    operations.sort((a, b) {
+      final occurredCompare = b.occurredAtMs.compareTo(a.occurredAtMs);
+      if (occurredCompare != 0) return occurredCompare;
+
+      final updatedCompare = b.updatedAtMs.compareTo(a.updatedAtMs);
+      if (updatedCompare != 0) return updatedCompare;
+
+      return b.createdAtMs.compareTo(a.createdAtMs);
+    });
+
+    return operations;
   }
 
   @override
