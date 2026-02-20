@@ -12,106 +12,118 @@ class SignInPage extends StatelessWidget {
     final theme = Theme.of(context);
     final state = context.watch<AuthCubit>().state;
     final isLoading = state is AuthStateSigningIn;
-    final message = (state is AuthStateSignedOut) ? state.message : null;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (message == null || !context.mounted) return;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(message)));
-    });
+    return BlocListener<AuthCubit, AuthState>(
+      listenWhen: (previous, current) {
+        return current is AuthStateSignedOut && current.message != null;
+      },
+      listener: (context, state) {
+        final msg = (state is AuthStateSignedOut) ? state.message : null;
+        if (msg == null) return;
 
-    return Scaffold(
-      backgroundColor: AppTheme.cardColor,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 8),
-                      const _SplashIllustration(),
-                      const SizedBox(height: 28),
-                      Text(
-                        'Gérez vos biens',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineLarge,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        "Suivez dépenses et revenus, même hors ligne. La synchronisation se fera automatiquement dès que vous aurez internet.",
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                      const Spacer(),
-                      _PageDots(
-                        activeIndex: 0,
-                        activeColor: AppTheme.accentColor,
-                        inactiveColor: AppTheme.accentColor.withValues(alpha: 0.18),
-                      ),
-                      const SizedBox(height: 18),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.accentColor,
-                            minimumSize: const Size.fromHeight(56),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(msg)));
+      },
+      child: Scaffold(
+        backgroundColor: AppTheme.cardColor,
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 18,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 8),
+                        const _SplashIllustration(),
+                        const SizedBox(height: 28),
+                        Text(
+                          'Gérez vos biens',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineLarge,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "Suivez dépenses et revenus, même hors ligne. La synchronisation se fera automatiquement dès que vous aurez internet.",
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyLarge,
+                        ),
+                        const Spacer(),
+                        _PageDots(
+                          activeIndex: 0,
+                          activeColor: AppTheme.accentColor,
+                          inactiveColor:
+                              AppTheme.accentColor.withValues(alpha: 0.18),
+                        ),
+                        const SizedBox(height: 18),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.accentColor,
+                              minimumSize: const Size.fromHeight(56),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
                             ),
+                            onPressed: isLoading
+                                ? null
+                                : () =>
+                                    context.read<AuthCubit>().signInWithGoogle(),
+                            child: isLoading
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : Text(
+                                    'Continuer',
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                           ),
+                        ),
+                        const SizedBox(height: 10),
+                        TextButton(
                           onPressed: isLoading
                               ? null
-                              : () => context.read<AuthCubit>().signInWithGoogle(),
-                          child: isLoading
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  'Continuer',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextButton(
-                        onPressed: isLoading
-                            ? null
-                            : () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Connexion requise pour continuer.'),
+                              : () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Connexion requise pour continuer.',
+                                      ),
+                                    ),
+                                  );
+                                },
+                          child: Text(
+                            "Passer pour l'instant",
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.textTheme.bodySmall?.color,
                             ),
-                          );
-                        },
-                        child: Text(
-                          "Passer pour l'instant",
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.textTheme.bodySmall?.color,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

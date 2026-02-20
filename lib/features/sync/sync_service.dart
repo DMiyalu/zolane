@@ -52,6 +52,7 @@ class SyncService {
   }
 
   Future<void> _pushLocal(String uid, {required void Function(int) onProcessed}) async {
+    // Push creates/updates first so remote has the base documents.
     final propertiesDirty = await _propertiesLocal.getDirty();
     for (final p in propertiesDirty) {
       await _propertiesRef(uid).doc(p.id).set(
@@ -69,22 +70,6 @@ class SyncService {
       );
 
       await _propertiesLocal.markSynced(id: p.id, updatedAtMs: p.updatedAtMs);
-      onProcessed(p.updatedAtMs);
-    }
-
-    final propertiesDeleted = await _propertiesLocal.getDeleted();
-    for (final p in propertiesDeleted) {
-      await _propertiesRef(uid).doc(p.id).set(
-        {
-          'id': p.id,
-          'updated_at_ms': p.updatedAtMs,
-          'deleted': true,
-        },
-        SetOptions(merge: true),
-      );
-
-      // After pushing the tombstone, remove locally (operations will cascade).
-      await _propertiesLocal.hardDelete(p.id);
       onProcessed(p.updatedAtMs);
     }
 
@@ -110,6 +95,7 @@ class SyncService {
       onProcessed(op.updatedAtMs);
     }
 
+    // Push operation tombstones BEFORE property hard-delete cascades remove them locally.
     final operationsDeleted = await _operationsLocal.getDeleted();
     for (final op in operationsDeleted) {
       await _operationsRef(uid).doc(op.id).set(
@@ -123,6 +109,22 @@ class SyncService {
 
       await _operationsLocal.hardDelete(op.id);
       onProcessed(op.updatedAtMs);
+    }
+
+    // Finally push property tombstones and then cleanup locally.
+    final propertiesDeleted = await _propertiesLocal.getDeleted();
+    for (final p in propertiesDeleted) {
+      await _propertiesRef(uid).doc(p.id).set(
+        {
+          'id': p.id,
+          'updated_at_ms': p.updatedAtMs,
+          'deleted': true,
+        },
+        SetOptions(merge: true),
+      );
+
+      await _propertiesLocal.hardDelete(p.id);
+      onProcessed(p.updatedAtMs);
     }
   }
 

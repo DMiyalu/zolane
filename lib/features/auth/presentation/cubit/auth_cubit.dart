@@ -66,7 +66,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(const AuthStateSignedOut());
       }
     } catch (e) {
-      emit(AuthStateSignedOut(message: e.toString()));
+      emit(AuthStateSignedOut(message: _humanMessage(e)));
     }
   }
 
@@ -77,8 +77,22 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _authRepository.signOut();
     } catch (e) {
-      emit(AuthStateSignedOut(message: e.toString()));
+      emit(AuthStateSignedOut(message: _humanMessage(e)));
     }
+  }
+
+  static String _humanMessage(Object error) {
+    final raw = error.toString();
+
+    if (raw.contains('Firebase not configured')) {
+      return 'Firebase non configuré. Vérifie la configuration puis relance.';
+    }
+
+    if (raw.contains('network') || raw.contains('Network')) {
+      return 'Connexion réseau indisponible. Réessaie.';
+    }
+
+    return 'Connexion impossible. Réessaie.';
   }
 
   @override
