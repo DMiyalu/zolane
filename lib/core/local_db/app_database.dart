@@ -71,6 +71,38 @@ CREATE TABLE meta (
           await db.execute(
             'ALTER TABLE operations ADD COLUMN rent_month_ms INTEGER',
           );
+
+          // Backfill rent month for existing rent income operations.
+          // Default assumption: rent month == month of the payment date.
+          final rows = await db.query(
+            'operations',
+            columns: ['id', 'occurred_at_ms', 'sync_status'],
+            where: 'kind = ? AND category = ? AND rent_month_ms IS NULL',
+            whereArgs: [1, 'Loyer'],
+          );
+
+          for (final row in rows) {
+            final id = row['id'] as String?;
+            final occurredAt = (row['occurred_at_ms'] as num?)?.toInt();
+            final syncStatus = (row['sync_status'] as num?)?.toInt();
+
+            if (id == null || occurredAt == null || syncStatus == null) continue;
+            if (syncStatus == SyncStatus.deleted) continue;
+
+            final d = DateTime.fromMillisecondsSinceEpoch(occurredAt);
+            final monthStart = DateTime(d.year, d.month, 1).millisecondsSinceEpoch;
+
+            await db.update(
+              'operations',
+              {
+                'rent_month_ms': monthStart,
+                'sync_status': SyncStatus.dirty,
+              },
+              where: 'id = ?',
+              whereArgs: [id],
+              conflictAlgorithm: ConflictAlgorithm.abort,
+            );
+          }
         }
       },
       onConfigure: (db) async {
