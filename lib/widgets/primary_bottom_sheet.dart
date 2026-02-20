@@ -13,6 +13,9 @@ class PrimaryBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewInsets = MediaQuery.viewInsetsOf(context);
+    final safePadding = MediaQuery.paddingOf(context);
+
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.cardColor,
@@ -63,7 +66,13 @@ class PrimaryBottomSheet extends StatelessWidget {
           ),
           Flexible(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppTheme.padding),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.only(
+                left: AppTheme.padding,
+                right: AppTheme.padding,
+                top: AppTheme.padding,
+                bottom: AppTheme.padding + safePadding.bottom + viewInsets.bottom,
+              ),
               child: child,
             ),
           ),

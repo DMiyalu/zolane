@@ -46,9 +46,34 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
   late OperationKind _kind;
   late DateTime _date;
 
-  late final TextEditingController _categoryController;
+  late String _selectedCategory;
   late final TextEditingController _amountController;
   late final TextEditingController _noteController;
+
+  static const List<String> _expenseCategories = [
+    'Crédits',
+    'Électricité',
+    'Eau',
+    'Assurances',
+    'Travaux',
+    'Gaz',
+    'Divers',
+  ];
+
+  static const List<String> _incomeCategories = [
+    'Loyer',
+    'Remboursement',
+  ];
+
+  static List<String> _baseCategoriesFor(OperationKind kind) {
+    return kind == OperationKind.expense ? _expenseCategories : _incomeCategories;
+  }
+
+  List<String> _categoryItemsForCurrentKind() {
+    final base = _baseCategoriesFor(_kind);
+    if (base.contains(_selectedCategory)) return base;
+    return [_selectedCategory, ...base];
+  }
 
   @override
   void initState() {
@@ -60,8 +85,10 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
       existing?.occurredAtMs ?? DateTime.now().millisecondsSinceEpoch,
     );
 
-    _categoryController =
-        TextEditingController(text: existing?.category ?? '');
+    final initialCategory = (existing?.category ?? '').trim();
+    _selectedCategory = initialCategory.isNotEmpty
+        ? initialCategory
+        : _baseCategoriesFor(_kind).first;
     _amountController = TextEditingController(
       text: existing == null
           ? ''
@@ -72,7 +99,6 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
 
   @override
   void dispose() {
-    _categoryController.dispose();
     _amountController.dispose();
     _noteController.dispose();
     super.dispose();
@@ -81,109 +107,132 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
   @override
   Widget build(BuildContext context) {
     final viewInsets = MediaQuery.viewInsetsOf(context);
+    final safePadding = MediaQuery.paddingOf(context);
     final isEditing = widget.existing != null;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: 20 + viewInsets.bottom,
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isEditing ? 'Modifier opération' : 'Nouvelle opération',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 14),
-            SegmentedButton<OperationKind>(
-              segments: const [
-                ButtonSegment(
-                  value: OperationKind.expense,
-                  label: Text('Dépense'),
-                ),
-                ButtonSegment(
-                  value: OperationKind.income,
-                  label: Text('Revenu'),
-                ),
-              ],
-              selected: {_kind},
-              onSelectionChanged: (s) {
-                setState(() => _kind = s.first);
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _categoryController,
-              decoration: const InputDecoration(labelText: 'Catégorie'),
-              textInputAction: TextInputAction.next,
-              validator: (v) {
-                final value = v?.trim() ?? '';
-                if (value.isEmpty) return 'Champ obligatoire';
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _amountController,
-              decoration: const InputDecoration(labelText: 'Montant (€)'),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-                signed: false,
+    return SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: 20 + safePadding.bottom + viewInsets.bottom,
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isEditing ? 'Modifier opération' : 'Nouvelle opération',
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              textInputAction: TextInputAction.next,
-              validator: (v) {
-                final cents = _parseAmountToCents(v);
-                if (cents == null || cents <= 0) return 'Montant invalide';
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Date'),
-              subtitle: Text(_formatDate(_date)),
-              trailing: const Icon(Icons.calendar_today_outlined),
-              onTap: () => _pickDate(context),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _noteController,
-              decoration: const InputDecoration(labelText: 'Note (optionnel)'),
-              minLines: 1,
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (!(_formKey.currentState?.validate() ?? false)) return;
-
-                  final cents = _parseAmountToCents(_amountController.text) ?? 0;
-                  final note = _noteController.text.trim().isEmpty
-                      ? null
-                      : _noteController.text.trim();
-
-                  Navigator.of(context).pop(
-                    OperationFormResult(
-                      kind: _kind,
-                      category: _categoryController.text.trim(),
-                      amountCents: cents,
-                      occurredAtMs: _date.millisecondsSinceEpoch,
-                      note: note,
-                    ),
-                  );
+              const SizedBox(height: 14),
+              SegmentedButton<OperationKind>(
+                segments: const [
+                  ButtonSegment(
+                    value: OperationKind.expense,
+                    label: Text('Dépense'),
+                  ),
+                  ButtonSegment(
+                    value: OperationKind.income,
+                    label: Text('Revenu'),
+                  ),
+                ],
+                selected: {_kind},
+                onSelectionChanged: (s) {
+                  final nextKind = s.first;
+                  final nextBase = _baseCategoriesFor(nextKind);
+                  setState(() {
+                    _kind = nextKind;
+                    if (!nextBase.contains(_selectedCategory)) {
+                      _selectedCategory = nextBase.first;
+                    }
+                  });
                 },
-                child: Text(isEditing ? 'Enregistrer' : 'Ajouter'),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                decoration: const InputDecoration(labelText: 'Catégorie'),
+                items: _categoryItemsForCurrentKind()
+                    .map(
+                      (c) => DropdownMenuItem(
+                        value: c,
+                        child: Text(c),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() => _selectedCategory = value);
+                },
+                validator: (v) {
+                  final value = v?.trim() ?? '';
+                  if (value.isEmpty) return 'Champ obligatoire';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _amountController,
+                decoration: const InputDecoration(labelText: 'Montant (€)'),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                  signed: false,
+                ),
+                textInputAction: TextInputAction.next,
+                validator: (v) {
+                  final cents = _parseAmountToCents(v);
+                  if (cents == null || cents <= 0) return 'Montant invalide';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Date'),
+                subtitle: Text(_formatDate(_date)),
+                trailing: const Icon(Icons.calendar_today_outlined),
+                onTap: () => _pickDate(context),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _noteController,
+                decoration: const InputDecoration(labelText: 'Note (optionnel)'),
+                minLines: 1,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+                    final cents = _parseAmountToCents(_amountController.text) ?? 0;
+                    final note = _noteController.text.trim().isEmpty
+                        ? null
+                        : _noteController.text.trim();
+
+                    Navigator.of(context).pop(
+                      OperationFormResult(
+                        kind: _kind,
+                        category: _selectedCategory.trim(),
+                        amountCents: cents,
+                        occurredAtMs: _date.millisecondsSinceEpoch,
+                        note: note,
+                      ),
+                    );
+                  },
+                  child: Text(isEditing ? 'Enregistrer' : 'Ajouter'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

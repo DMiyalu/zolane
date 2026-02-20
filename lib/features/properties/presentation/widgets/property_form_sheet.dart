@@ -69,89 +69,94 @@ class _PropertyFormSheetState extends State<PropertyFormSheet> {
   @override
   Widget build(BuildContext context) {
     final viewInsets = MediaQuery.viewInsetsOf(context);
+    final safePadding = MediaQuery.paddingOf(context);
     final isEditing = widget.existing != null;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: 20 + viewInsets.bottom,
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isEditing ? 'Modifier le bien' : 'Nouveau bien',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 14),
-            TextFormField(
-              controller: _labelController,
-              decoration: const InputDecoration(labelText: 'Nom du bien'),
-              textInputAction: TextInputAction.next,
-              validator: (v) {
-                final value = v?.trim() ?? '';
-                if (value.isEmpty) return 'Champ obligatoire';
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _cityController,
-              decoration: const InputDecoration(labelText: 'Ville'),
-              textInputAction: TextInputAction.next,
-              validator: (v) {
-                final value = v?.trim() ?? '';
-                if (value.isEmpty) return 'Champ obligatoire';
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _addressController,
-              decoration: const InputDecoration(labelText: 'Adresse'),
-              textInputAction: TextInputAction.next,
-              validator: (v) {
-                final value = v?.trim() ?? '';
-                if (value.isEmpty) return 'Champ obligatoire';
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _noteController,
-              decoration: const InputDecoration(
-                labelText: 'Note (optionnel)',
+    return SafeArea(
+      top: false,
+      child: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: 20 + safePadding.bottom + viewInsets.bottom,
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isEditing ? 'Modifier le bien' : 'Nouveau bien',
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              minLines: 1,
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (!(_formKey.currentState?.validate() ?? false)) return;
-
-                  Navigator.of(context).pop(
-                    PropertyFormResult(
-                      label: _labelController.text.trim(),
-                      city: _cityController.text.trim(),
-                      address: _addressController.text.trim(),
-                      note: _noteController.text.trim().isEmpty
-                          ? null
-                          : _noteController.text.trim(),
-                    ),
-                  );
+              const SizedBox(height: 14),
+              TextFormField(
+                controller: _labelController,
+                decoration: const InputDecoration(labelText: 'Nom du bien'),
+                textInputAction: TextInputAction.next,
+                validator: (v) {
+                  final value = v?.trim() ?? '';
+                  if (value.isEmpty) return 'Champ obligatoire';
+                  return null;
                 },
-                child: Text(isEditing ? 'Enregistrer' : 'Créer'),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _cityController,
+                decoration: const InputDecoration(labelText: 'Ville'),
+                textInputAction: TextInputAction.next,
+                validator: (v) {
+                  final value = v?.trim() ?? '';
+                  if (value.isEmpty) return 'Champ obligatoire';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _addressController,
+                decoration: const InputDecoration(labelText: 'Adresse'),
+                textInputAction: TextInputAction.next,
+                validator: (v) {
+                  final value = v?.trim() ?? '';
+                  if (value.isEmpty) return 'Champ obligatoire';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _noteController,
+                decoration: const InputDecoration(
+                  labelText: 'Note (optionnel)',
+                ),
+                minLines: 1,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+                    Navigator.of(context).pop(
+                      PropertyFormResult(
+                        label: _labelController.text.trim(),
+                        city: _cityController.text.trim(),
+                        address: _addressController.text.trim(),
+                        note: _noteController.text.trim().isEmpty
+                            ? null
+                            : _noteController.text.trim(),
+                      ),
+                    );
+                  },
+                  child: Text(isEditing ? 'Enregistrer' : 'Créer'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
