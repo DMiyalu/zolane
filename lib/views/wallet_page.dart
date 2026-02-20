@@ -59,6 +59,7 @@ class _WalletPageState extends State<WalletPage> {
                   onTap: () {
                     Navigator.of(context).pop();
                     Future.delayed(const Duration(milliseconds: 200), () {
+                      if (!context.mounted) return;
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -78,6 +79,7 @@ class _WalletPageState extends State<WalletPage> {
                   onTap: () {
                     Navigator.of(context).pop();
                     Future.delayed(const Duration(milliseconds: 200), () {
+                      if (!context.mounted) return;
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -110,16 +112,19 @@ class _WalletPageState extends State<WalletPage> {
         child: Container(
           padding: const EdgeInsets.all(AppTheme.padding),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.05),
+            color: color.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2), width: 1),
+            border: Border.all(
+              color: color.withValues(alpha: 0.2),
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 24),

@@ -88,6 +88,14 @@ class AuthCubit extends Cubit<AuthState> {
       return 'Firebase non configuré. Vérifie la configuration puis relance.';
     }
 
+    // Common Google Sign-In misconfiguration signals on Android.
+    // Example: ApiException: 10 (DEVELOPER_ERROR)
+    if (raw.contains('DEVELOPER_ERROR') ||
+        raw.contains('ApiException: 10') ||
+        raw.contains('sign_in_failed')) {
+      return 'Connexion Google non configurée (OAuth / SHA-1). Vérifie Firebase puis réessaie.';
+    }
+
     if (raw.contains('network') || raw.contains('Network')) {
       return 'Connexion réseau indisponible. Réessaie.';
     }

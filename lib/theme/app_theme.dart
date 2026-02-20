@@ -29,7 +29,6 @@ class AppTheme {
         secondary: accentColor,
         surface: cardColor,
         error: errorColor,
-        background: backgroundColor,
       ),
       cardTheme: const CardThemeData(
         elevation: 0,

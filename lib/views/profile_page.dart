@@ -35,8 +35,12 @@ class ProfilePage extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          AppTheme.accentColor.withOpacity(0.1),
-                          AppTheme.accentColor.withOpacity(0.05),
+                          AppTheme.accentColor.withValues(
+                            alpha: 0.1,
+                          ),
+                          AppTheme.accentColor.withValues(
+                            alpha: 0.05,
+                          ),
                         ],
                       ),
                     ),
@@ -59,7 +63,9 @@ class ProfilePage extends StatelessWidget {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppTheme.accentColor.withOpacity(0.3),
+                                    color: AppTheme.accentColor.withValues(
+                                      alpha: 0.3,
+                                    ),
                                     blurRadius: 20,
                                     spreadRadius: 5,
                                   ),
@@ -78,7 +84,9 @@ class ProfilePage extends StatelessWidget {
                                             end: Alignment.bottomRight,
                                             colors: [
                                               AppTheme.accentColor,
-                                              AppTheme.accentColor.withOpacity(0.7),
+                                              AppTheme.accentColor.withValues(
+                                                alpha: 0.7,
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -106,7 +114,9 @@ class ProfilePage extends StatelessWidget {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.2,
+                                        ),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -138,7 +148,9 @@ class ProfilePage extends StatelessWidget {
                               child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.accentColor.withOpacity(0.1),
+                                  color: AppTheme.accentColor.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(
@@ -211,7 +223,7 @@ class ProfilePage extends StatelessWidget {
                               trailing: Switch(
                                 value: true,
                                 onChanged: (value) {},
-                                activeColor: AppTheme.accentColor,
+                                activeThumbColor: AppTheme.accentColor,
                               ),
                             ),
                             _InfoItem(
@@ -272,7 +284,7 @@ class ProfilePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -288,7 +300,9 @@ class ProfilePage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppTheme.accentColor.withOpacity(0.1),
+                      color: AppTheme.accentColor.withValues(
+                      alpha: 0.1,
+                      ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -430,7 +444,9 @@ class ProfilePage extends StatelessWidget {
               leading: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.accentColor.withOpacity(0.1),
+                  color: AppTheme.accentColor.withValues(
+                    alpha: 0.1,
+                  ),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -458,7 +474,9 @@ class ProfilePage extends StatelessWidget {
               leading: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.accentColor.withOpacity(0.1),
+                  color: AppTheme.accentColor.withValues(
+                    alpha: 0.1,
+                  ),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -487,7 +505,9 @@ class ProfilePage extends StatelessWidget {
                 leading: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppTheme.errorColor.withOpacity(0.1),
+                    color: AppTheme.errorColor.withValues(
+                      alpha: 0.1,
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(

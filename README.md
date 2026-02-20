@@ -1,16 +1,34 @@
-# zolane
+# Zolane
 
-A new Flutter project.
+MVP Flutter (offline-first SQLite + sync Firestore) avec authentification Google via Firebase Auth.
 
-## Getting Started
+## Pré-requis
 
-This project is a starting point for a Flutter application.
+- Flutter SDK installé
+- Un projet Firebase configuré (ce repo contient déjà `lib/firebase_options.dart`, `android/app/google-services.json`, et `ios/Runner/GoogleService-Info.plist`)
 
-A few resources to get you started if this is your first Flutter project:
+## Lancer l'app
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+flutter pub get
+flutter run
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Dépannage Firebase / Firestore
+
+Si tu vois dans les logs Android :
+
+`PERMISSION_DENIED: Cloud Firestore API has not been used in project ... or it is disabled`
+
+alors il manque l'activation de Firestore côté projet Google Cloud / Firebase.
+
+À faire :
+
+1) Firebase Console → **Build** → **Firestore Database** → **Create database** (crée la base)
+2) (si nécessaire) Google Cloud Console → **APIs & Services** → activer **Cloud Firestore API**
+
+Une fois Firestore activé, la sync utilise ces collections :
+
+- `users/{uid}/properties`
+- `users/{uid}/operations`
+

@@ -109,7 +109,7 @@ class _AddEntryFormState extends State<AddEntryForm> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<ImmoProperty>(
-                value: _selectedProperty,
+                initialValue: _selectedProperty,
                 decoration: const InputDecoration(
                   hintText: 'Sélectionner un bien',
                 ),

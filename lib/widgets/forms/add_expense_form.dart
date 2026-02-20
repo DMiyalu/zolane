@@ -132,7 +132,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<ImmoProperty>(
-                value: _selectedProperty,
+                initialValue: _selectedProperty,
                 decoration: const InputDecoration(
                   hintText: 'Sélectionner un bien',
                 ),
@@ -161,7 +161,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<ImmoChargeReason>(
-                value: _selectedImmoReason,
+                initialValue: _selectedImmoReason,
                 decoration: const InputDecoration(
                   hintText: 'Sélectionner une raison',
                 ),
@@ -190,7 +190,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<PersonalReason>(
-                value: _selectedPersonalReason,
+                initialValue: _selectedPersonalReason,
                 decoration: const InputDecoration(
                   hintText: 'Sélectionner une raison',
                 ),

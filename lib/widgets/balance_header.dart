@@ -36,19 +36,27 @@ class BalanceHeader extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: isPositive
                 ? [
-                    AppTheme.successColor.withOpacity(0.1),
-                    AppTheme.successColor.withOpacity(0.05),
+                    AppTheme.successColor.withValues(
+                      alpha: 0.1,
+                    ),
+                    AppTheme.successColor.withValues(
+                      alpha: 0.05,
+                    ),
                   ]
                 : [
-                    AppTheme.errorColor.withOpacity(0.1),
-                    AppTheme.errorColor.withOpacity(0.05),
+                    AppTheme.errorColor.withValues(
+                      alpha: 0.1,
+                    ),
+                    AppTheme.errorColor.withValues(
+                      alpha: 0.05,
+                    ),
                   ],
           ),
           borderRadius: BorderRadius.circular(AppTheme.cardRadius),
           border: Border.all(
             color: isPositive
-                ? AppTheme.successColor.withOpacity(0.2)
-                : AppTheme.errorColor.withOpacity(0.2),
+                ? AppTheme.successColor.withValues(alpha: 0.2)
+                : AppTheme.errorColor.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -63,8 +71,12 @@ class BalanceHeader extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: isPositive
-                          ? AppTheme.successColor.withOpacity(0.15)
-                          : AppTheme.errorColor.withOpacity(0.15),
+                          ? AppTheme.successColor.withValues(
+                            alpha: 0.15,
+                          )
+                          : AppTheme.errorColor.withValues(
+                            alpha: 0.15,
+                          ),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -131,7 +143,7 @@ class BalanceHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppTheme.smallPadding),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(

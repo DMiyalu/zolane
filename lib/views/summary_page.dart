@@ -44,19 +44,31 @@ class SummaryPage extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: isPositive
                             ? [
-                                AppTheme.successColor.withOpacity(0.15),
-                                AppTheme.successColor.withOpacity(0.08),
+                                AppTheme.successColor.withValues(
+                                  alpha: 0.15,
+                                ),
+                                AppTheme.successColor.withValues(
+                                  alpha: 0.08,
+                                ),
                               ]
                             : [
-                                AppTheme.errorColor.withOpacity(0.15),
-                                AppTheme.errorColor.withOpacity(0.08),
+                                AppTheme.errorColor.withValues(
+                                  alpha: 0.15,
+                                ),
+                                AppTheme.errorColor.withValues(
+                                  alpha: 0.08,
+                                ),
                               ],
                       ),
                       borderRadius: BorderRadius.circular(AppTheme.cardRadius),
                       border: Border.all(
                         color: isPositive
-                            ? AppTheme.successColor.withOpacity(0.3)
-                            : AppTheme.errorColor.withOpacity(0.3),
+                            ? AppTheme.successColor.withValues(
+                              alpha: 0.3,
+                            )
+                            : AppTheme.errorColor.withValues(
+                              alpha: 0.3,
+                            ),
                         width: 1.5,
                       ),
                     ),
@@ -72,7 +84,7 @@ class SummaryPage extends StatelessWidget {
                                 color: (isPositive
                                         ? AppTheme.successColor
                                         : AppTheme.errorColor)
-                                    .withOpacity(0.2),
+                                    .withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
@@ -145,7 +157,9 @@ class SummaryPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppTheme.accentColor.withOpacity(0.1),
+                        color: AppTheme.accentColor.withValues(
+                          alpha: 0.1,
+                        ),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
@@ -186,7 +200,9 @@ class SummaryPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(AppTheme.cardRadius),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withValues(
+                              alpha: 0.04,
+                            ),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
@@ -197,7 +213,9 @@ class SummaryPage extends StatelessWidget {
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: AppTheme.accentColor.withOpacity(0.1),
+                            color: AppTheme.accentColor.withValues(
+                              alpha: 0.1,
+                            ),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -256,12 +274,12 @@ class SummaryPage extends StatelessWidget {
         color: AppTheme.cardColor,
         borderRadius: BorderRadius.circular(AppTheme.cardRadius),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -276,7 +294,7 @@ class SummaryPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 20),

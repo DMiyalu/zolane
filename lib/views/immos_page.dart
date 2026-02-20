@@ -28,10 +28,14 @@ class ImmosPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(AppTheme.padding),
                       decoration: BoxDecoration(
-                        color: AppTheme.accentColor.withOpacity(0.05),
+                        color: AppTheme.accentColor.withValues(
+                          alpha: 0.05,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: AppTheme.accentColor.withOpacity(0.2),
+                          color: AppTheme.accentColor.withValues(
+                            alpha: 0.2,
+                          ),
                           width: 1,
                         ),
                       ),
@@ -40,7 +44,9 @@ class ImmosPage extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppTheme.accentColor.withOpacity(0.1),
+                              color: AppTheme.accentColor.withValues(
+                                alpha: 0.1,
+                              ),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
