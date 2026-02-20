@@ -153,6 +153,7 @@ class _PropertyDetailView extends StatelessWidget {
           category: result.category,
           amountCents: result.amountCents,
           occurredAtMs: result.occurredAtMs,
+          rentMonthMs: result.rentMonthMs,
           note: result.note,
         );
   }
@@ -167,6 +168,7 @@ class _PropertyDetailView extends StatelessWidget {
           category: result.category,
           amountCents: result.amountCents,
           occurredAtMs: result.occurredAtMs,
+          rentMonthMs: result.rentMonthMs,
           note: result.note,
         );
   }
@@ -219,6 +221,11 @@ class _OperationTile extends StatelessWidget {
     final sign = isExpense ? '-' : '+';
     final color = isExpense ? AppTheme.errorColor : AppTheme.successColor;
 
+    final rentMonthMs = operation.rentMonthMs;
+    final rentMonthText = (operation.category == 'Loyer' && rentMonthMs != null)
+      ? _formatMonth(DateTime.fromMillisecondsSinceEpoch(rentMonthMs))
+      : null;
+
     return Dismissible(
       key: ValueKey(operation.id),
       direction: DismissDirection.endToStart,
@@ -258,9 +265,13 @@ class _OperationTile extends StatelessWidget {
       child: Card(
         child: ListTile(
           title: Text(operation.category),
-          subtitle: Text(_formatDate(
-            DateTime.fromMillisecondsSinceEpoch(operation.occurredAtMs),
-          )),
+          subtitle: Text(
+            rentMonthText == null
+                ? _formatDate(
+                    DateTime.fromMillisecondsSinceEpoch(operation.occurredAtMs),
+                  )
+                : 'Versement: ${_formatDate(DateTime.fromMillisecondsSinceEpoch(operation.occurredAtMs))} • Mois: $rentMonthText',
+          ),
           trailing: Text(
             '$sign$amount €',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -279,6 +290,12 @@ class _OperationTile extends StatelessWidget {
     final mm = d.month.toString().padLeft(2, '0');
     final yyyy = d.year.toString();
     return '$dd/$mm/$yyyy';
+  }
+
+  static String _formatMonth(DateTime d) {
+    final mm = d.month.toString().padLeft(2, '0');
+    final yyyy = d.year.toString();
+    return '$mm/$yyyy';
   }
 }
 

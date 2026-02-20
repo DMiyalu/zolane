@@ -9,6 +9,7 @@ abstract interface class OperationsRepository {
     required String category,
     required int amountCents,
     required int occurredAtMs,
+    int? rentMonthMs,
     String? note,
   });
 
@@ -19,6 +20,7 @@ abstract interface class OperationsRepository {
     required String category,
     required int amountCents,
     required int occurredAtMs,
+    int? rentMonthMs,
     String? note,
   });
 

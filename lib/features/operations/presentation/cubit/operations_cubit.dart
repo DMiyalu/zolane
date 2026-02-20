@@ -46,6 +46,7 @@ class OperationsCubit extends Cubit<OperationsState> {
     required String category,
     required int amountCents,
     required int occurredAtMs,
+    int? rentMonthMs,
     String? note,
   }) async {
     try {
@@ -55,6 +56,7 @@ class OperationsCubit extends Cubit<OperationsState> {
         category: category,
         amountCents: amountCents,
         occurredAtMs: occurredAtMs,
+        rentMonthMs: rentMonthMs,
         note: note,
       );
       await load();
@@ -69,6 +71,7 @@ class OperationsCubit extends Cubit<OperationsState> {
     required String category,
     required int amountCents,
     required int occurredAtMs,
+    int? rentMonthMs,
     String? note,
   }) async {
     try {
@@ -79,6 +82,7 @@ class OperationsCubit extends Cubit<OperationsState> {
         category: category,
         amountCents: amountCents,
         occurredAtMs: occurredAtMs,
+        rentMonthMs: rentMonthMs,
         note: note,
       );
       await load();

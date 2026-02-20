@@ -28,6 +28,8 @@ class Operation {
   final int amountCents;
   final String? note;
   final int occurredAtMs;
+  /// For rent payments: month concerned by the payment (stored as a month start timestamp).
+  final int? rentMonthMs;
   final int createdAtMs;
   final int updatedAtMs;
   final int syncStatus;
@@ -40,6 +42,7 @@ class Operation {
     required this.amountCents,
     required this.note,
     required this.occurredAtMs,
+    required this.rentMonthMs,
     required this.createdAtMs,
     required this.updatedAtMs,
     required this.syncStatus,

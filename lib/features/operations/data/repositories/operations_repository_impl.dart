@@ -27,6 +27,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
     required String category,
     required int amountCents,
     required int occurredAtMs,
+    int? rentMonthMs,
     String? note,
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -39,6 +40,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
       amountCents: amountCents,
       note: (note == null || note.trim().isEmpty) ? null : note.trim(),
       occurredAtMs: occurredAtMs,
+      rentMonthMs: rentMonthMs,
       createdAtMs: now,
       updatedAtMs: now,
       syncStatus: SyncStatus.dirty,
@@ -56,6 +58,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
     required String category,
     required int amountCents,
     required int occurredAtMs,
+    int? rentMonthMs,
     String? note,
   }) async {
     final existing = await _local.getById(id);
@@ -73,6 +76,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
       amountCents: amountCents,
       note: (note == null || note.trim().isEmpty) ? null : note.trim(),
       occurredAtMs: occurredAtMs,
+      rentMonthMs: rentMonthMs,
       createdAtMs: existing.createdAtMs,
       updatedAtMs: now,
       syncStatus: SyncStatus.dirty,

@@ -84,6 +84,7 @@ class SyncService {
           'amount_cents': op.amountCents,
           'note': op.note,
           'occurred_at_ms': op.occurredAtMs,
+          'rent_month_ms': op.rentMonthMs,
           'created_at_ms': op.createdAtMs,
           'updated_at_ms': op.updatedAtMs,
           'deleted': false,
@@ -229,6 +230,7 @@ class SyncService {
     final category = data['category'] as String?;
     final amountCents = _asInt(data['amount_cents']);
     final occurredAtMs = _asInt(data['occurred_at_ms']);
+    final rentMonthMs = _asInt(data['rent_month_ms']);
     final createdAtMs = _asInt(data['created_at_ms']);
     final updatedAtMs = _asInt(data['updated_at_ms']);
 
@@ -248,6 +250,7 @@ class SyncService {
       amountCents: amountCents,
       note: data['note'] as String?,
       occurredAtMs: occurredAtMs,
+      rentMonthMs: rentMonthMs,
       createdAtMs: createdAtMs,
       updatedAtMs: updatedAtMs,
       syncStatus: 0,

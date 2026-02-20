@@ -10,7 +10,7 @@ class AppDatabase {
   const AppDatabase._(this.db);
 
   static const _dbName = 'zolane.db';
-  static const _dbVersion = 2;
+  static const _dbVersion = 3;
 
   static Future<AppDatabase> open() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -49,6 +49,7 @@ CREATE TABLE operations (
   amount_cents INTEGER NOT NULL,
   note TEXT,
   occurred_at_ms INTEGER NOT NULL,
+  rent_month_ms INTEGER,
   created_at_ms INTEGER NOT NULL,
   updated_at_ms INTEGER NOT NULL,
   sync_status INTEGER NOT NULL,
@@ -64,6 +65,12 @@ CREATE TABLE meta (
   value TEXT NOT NULL
 );
 ''');
+        }
+
+        if (oldVersion < 3) {
+          await db.execute(
+            'ALTER TABLE operations ADD COLUMN rent_month_ms INTEGER',
+          );
         }
       },
       onConfigure: (db) async {

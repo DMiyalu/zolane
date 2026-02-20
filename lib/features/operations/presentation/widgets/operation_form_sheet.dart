@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../theme/app_theme.dart';
 import '../../domain/entities/operation.dart';
@@ -8,6 +9,7 @@ class OperationFormResult {
   final String category;
   final int amountCents;
   final int occurredAtMs;
+  final int? rentMonthMs;
   final String? note;
 
   const OperationFormResult({
@@ -15,6 +17,7 @@ class OperationFormResult {
     required this.category,
     required this.amountCents,
     required this.occurredAtMs,
+    required this.rentMonthMs,
     required this.note,
   });
 }
@@ -47,6 +50,7 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
   late DateTime _date;
 
   late String _selectedCategory;
+  DateTime? _selectedRentMonth;
   late final TextEditingController _amountController;
   late final TextEditingController _noteController;
 
@@ -89,6 +93,14 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
     _selectedCategory = initialCategory.isNotEmpty
         ? initialCategory
         : _baseCategoriesFor(_kind).first;
+
+    final existingRentMonthMs = existing?.rentMonthMs;
+    if (_kind == OperationKind.income && _selectedCategory == 'Loyer' && existingRentMonthMs != null) {
+      final d = DateTime.fromMillisecondsSinceEpoch(existingRentMonthMs);
+      _selectedRentMonth = DateTime(d.year, d.month, 1);
+    } else if (_selectedCategory == 'Loyer' && _kind == OperationKind.income) {
+      _selectedRentMonth = DateTime(_date.year, _date.month, 1);
+    }
     _amountController = TextEditingController(
       text: existing == null
           ? ''
@@ -109,6 +121,7 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
     final viewInsets = MediaQuery.viewInsetsOf(context);
     final safePadding = MediaQuery.paddingOf(context);
     final isEditing = widget.existing != null;
+    final showRentMonth = _kind == OperationKind.income && _selectedCategory == 'Loyer';
 
     return SafeArea(
       top: false,
@@ -168,7 +181,14 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
                     .toList(),
                 onChanged: (value) {
                   if (value == null) return;
-                  setState(() => _selectedCategory = value);
+                  setState(() {
+                    _selectedCategory = value;
+                    if (_kind == OperationKind.income && _selectedCategory == 'Loyer') {
+                      _selectedRentMonth ??= DateTime(_date.year, _date.month, 1);
+                    } else {
+                      _selectedRentMonth = null;
+                    }
+                  });
                 },
                 validator: (v) {
                   final value = v?.trim() ?? '';
@@ -177,6 +197,30 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
                 },
               ),
               const SizedBox(height: 12),
+              if (showRentMonth) ...[
+                DropdownButtonFormField<DateTime>(
+                  value: _selectedRentMonth,
+                  decoration: const InputDecoration(labelText: 'Mois du loyer'),
+                  items: _rentMonthOptions()
+                      .map(
+                        (m) => DropdownMenuItem(
+                          value: m,
+                          child: Text(_formatRentMonth(m)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _selectedRentMonth = value);
+                  },
+                  validator: (v) {
+                    if (!showRentMonth) return null;
+                    if (v == null) return 'Champ obligatoire';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
               TextFormField(
                 controller: _amountController,
                 decoration: const InputDecoration(labelText: 'Montant (€)'),
@@ -194,7 +238,7 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
               const SizedBox(height: 12),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Date'),
+                title: const Text('Date du versement'),
                 subtitle: Text(_formatDate(_date)),
                 trailing: const Icon(Icons.calendar_today_outlined),
                 onTap: () => _pickDate(context),
@@ -224,6 +268,9 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
                         category: _selectedCategory.trim(),
                         amountCents: cents,
                         occurredAtMs: _date.millisecondsSinceEpoch,
+                        rentMonthMs: showRentMonth
+                            ? _selectedRentMonth?.millisecondsSinceEpoch
+                            : null,
                         note: note,
                       ),
                     );
@@ -248,6 +295,32 @@ class _OperationFormSheetState extends State<OperationFormSheet> {
 
     if (!mounted || picked == null) return;
     setState(() => _date = DateTime(picked.year, picked.month, picked.day));
+  }
+
+  List<DateTime> _rentMonthOptions() {
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month - 18, 1);
+    final end = DateTime(now.year, now.month + 6, 1);
+
+    final months = <DateTime>[];
+    var cursor = start;
+    while (!cursor.isAfter(end)) {
+      months.add(cursor);
+      cursor = DateTime(cursor.year, cursor.month + 1, 1);
+    }
+
+    final current = _selectedRentMonth;
+    if (current != null && !months.contains(current)) {
+      months.add(current);
+      months.sort((a, b) => a.compareTo(b));
+    }
+
+    return months;
+  }
+
+  static String _formatRentMonth(DateTime d) {
+    // Ex: "février 2026"
+    return DateFormat('MMMM yyyy', 'fr_FR').format(d);
   }
 
   static int? _parseAmountToCents(String? input) {

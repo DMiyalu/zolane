@@ -8,6 +8,7 @@ class OperationModel {
   final int amountCents;
   final String? note;
   final int occurredAtMs;
+  final int? rentMonthMs;
   final int createdAtMs;
   final int updatedAtMs;
   final int syncStatus;
@@ -20,6 +21,7 @@ class OperationModel {
     required this.amountCents,
     required this.note,
     required this.occurredAtMs,
+    required this.rentMonthMs,
     required this.createdAtMs,
     required this.updatedAtMs,
     required this.syncStatus,
@@ -34,6 +36,7 @@ class OperationModel {
       amountCents: (map['amount_cents'] as num).toInt(),
       note: map['note'] as String?,
       occurredAtMs: (map['occurred_at_ms'] as num).toInt(),
+      rentMonthMs: (map['rent_month_ms'] as num?)?.toInt(),
       createdAtMs: (map['created_at_ms'] as num).toInt(),
       updatedAtMs: (map['updated_at_ms'] as num).toInt(),
       syncStatus: (map['sync_status'] as num).toInt(),
@@ -49,6 +52,7 @@ class OperationModel {
       'amount_cents': amountCents,
       'note': note,
       'occurred_at_ms': occurredAtMs,
+      'rent_month_ms': rentMonthMs,
       'created_at_ms': createdAtMs,
       'updated_at_ms': updatedAtMs,
       'sync_status': syncStatus,
@@ -64,6 +68,7 @@ class OperationModel {
       amountCents: amountCents,
       note: note,
       occurredAtMs: occurredAtMs,
+      rentMonthMs: rentMonthMs,
       createdAtMs: createdAtMs,
       updatedAtMs: updatedAtMs,
       syncStatus: syncStatus,
