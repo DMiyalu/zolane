@@ -12,7 +12,20 @@
           "package_name": "com.zolane.zolane"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "510072287638-kb0bpur9iusd4p2h3dot0ajdot7d2jcv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zolane.zolane",
+            "certificate_hash": "f2f54e23fc8e08d13105821c890131ea3f6a3734"
+          }
+        },
+        {
+          "client_id": "510072287638-k66s497m7n12dkpfls0g5bia1a33ap4m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC3q7nOHDrk_-F7eUUrjU3wtPU1D6DIaDA"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "510072287638-k66s497m7n12dkpfls0g5bia1a33ap4m.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "510072287638-fcm2qvd4kp6kkt0le9bnfvijd84agvfh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zolane.zolane"
+              }
+            }
+          ]
         }
       }
     }

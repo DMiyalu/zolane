@@ -50,7 +50,9 @@ class _AppGate extends StatelessWidget {
         return switch (state) {
           AuthStateInitial() => const _SplashPage(),
           AuthStateSignedOut() => const SignInPage(),
+          AuthStateSigningIn() => const SignInPage(),
           AuthStateSignedIn(:final user) => HomeShell(user: user),
+          AuthStateSigningOut(:final user) => HomeShell(user: user),
         };
       },
     );
