@@ -4,14 +4,44 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/auth_cubit.dart';
 import '../../../../theme/app_theme.dart';
 
-class SignInPage extends StatelessWidget {
+enum _SignInMethod {
+  email,
+  google,
+}
+
+class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
+
+  @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  _SignInMethod _method = _SignInMethod.google;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  bool _isValidEmail(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return false;
+    return RegExp(r'^\S+@\S+\.\S+$').hasMatch(value);
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final state = context.watch<AuthCubit>().state;
     final isLoading = state is AuthStateSigningIn;
+
+    final isEmail = _method == _SignInMethod.email;
 
     return BlocListener<AuthCubit, AuthState>(
       listenWhen: (previous, current) {
@@ -56,6 +86,80 @@ class SignInPage extends StatelessWidget {
                           style: theme.textTheme.bodyLarge,
                         ),
                         const Spacer(),
+                        SegmentedButton<_SignInMethod>(
+                          segments: const [
+                            ButtonSegment(
+                              value: _SignInMethod.email,
+                              label: Text('Email / Mot de passe'),
+                            ),
+                            ButtonSegment(
+                              value: _SignInMethod.google,
+                              label: Text('Par Google'),
+                            ),
+                          ],
+                          selected: {_method},
+                          onSelectionChanged: isLoading
+                              ? null
+                              : (s) {
+                                  setState(() => _method = s.first);
+                                },
+                        ),
+                        const SizedBox(height: 14),
+                        if (isEmail) ...[
+                          Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  controller: _emailController,
+                                  enabled: !isLoading,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Email',
+                                  ),
+                                  keyboardType: TextInputType.emailAddress,
+                                  textInputAction: TextInputAction.next,
+                                  validator: (v) {
+                                    if (!_isValidEmail(v ?? '')) {
+                                      return 'Email invalide';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                TextFormField(
+                                  controller: _passwordController,
+                                  enabled: !isLoading,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Mot de passe',
+                                  ),
+                                  obscureText: true,
+                                  textInputAction: TextInputAction.done,
+                                  onFieldSubmitted: (_) {
+                                    if (isLoading) return;
+                                    final ok =
+                                        _formKey.currentState?.validate() ??
+                                            false;
+                                    if (!ok) return;
+                                    context
+                                        .read<AuthCubit>()
+                                        .signInWithEmailPassword(
+                                          email: _emailController.text,
+                                          password: _passwordController.text,
+                                        );
+                                  },
+                                  validator: (v) {
+                                    final value = (v ?? '').trim();
+                                    if (value.isEmpty) {
+                                      return 'Mot de passe requis';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                        ],
                         _PageDots(
                           activeIndex: 0,
                           activeColor: AppTheme.accentColor,
@@ -76,8 +180,26 @@ class SignInPage extends StatelessWidget {
                             ),
                             onPressed: isLoading
                                 ? null
-                                : () =>
-                                    context.read<AuthCubit>().signInWithGoogle(),
+                                : () {
+                                    if (_method == _SignInMethod.google) {
+                                      context
+                                          .read<AuthCubit>()
+                                          .signInWithGoogle();
+                                      return;
+                                    }
+
+                                    final ok =
+                                        _formKey.currentState?.validate() ??
+                                            false;
+                                    if (!ok) return;
+
+                                    context
+                                        .read<AuthCubit>()
+                                        .signInWithEmailPassword(
+                                          email: _emailController.text,
+                                          password: _passwordController.text,
+                                        );
+                                  },
                             child: isLoading
                                 ? const SizedBox(
                                     width: 22,
@@ -88,7 +210,9 @@ class SignInPage extends StatelessWidget {
                                     ),
                                   )
                                 : Text(
-                                    'Continuer',
+                                    _method == _SignInMethod.google
+                                        ? 'Continuer avec Google'
+                                        : 'Se connecter',
                                     style: theme.textTheme.titleMedium?.copyWith(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700,

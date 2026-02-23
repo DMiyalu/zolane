@@ -28,6 +28,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> signInWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
+    final ds = _dataSource;
+    if (ds == null) {
+      throw StateError('Firebase not configured');
+    }
+
+    await ds.signInWithEmailPassword(email: email, password: password);
+  }
+
+  @override
   Future<void> signOut() async {
     final ds = _dataSource;
     if (ds == null) return;

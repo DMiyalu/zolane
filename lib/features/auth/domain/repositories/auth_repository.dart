@@ -5,5 +5,10 @@ abstract interface class AuthRepository {
 
   Future<void> signInWithGoogle();
 
+  Future<void> signInWithEmailPassword({
+    required String email,
+    required String password,
+  });
+
   Future<void> signOut();
 }

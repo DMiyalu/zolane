@@ -70,6 +70,26 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> signInWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
+    emit(const AuthStateSigningIn());
+
+    try {
+      await _authRepository.signInWithEmailPassword(
+        email: email.trim(),
+        password: password,
+      );
+
+      if (_lastUser == null) {
+        emit(const AuthStateSignedOut());
+      }
+    } catch (e) {
+      emit(AuthStateSignedOut(message: _humanMessage(e)));
+    }
+  }
+
   Future<void> signOut() async {
     final user = _lastUser;
     if (user != null) emit(AuthStateSigningOut(user));
@@ -98,6 +118,23 @@ class AuthCubit extends Cubit<AuthState> {
 
     if (raw.contains('network') || raw.contains('Network')) {
       return 'Connexion réseau indisponible. Réessaie.';
+    }
+
+    // FirebaseAuth (email/password) common codes
+    if (raw.contains('invalid-email')) {
+      return 'Adresse email invalide.';
+    }
+    if (raw.contains('user-disabled')) {
+      return 'Compte désactivé. Contacte le support.';
+    }
+    if (raw.contains('user-not-found') || raw.contains('INVALID_LOGIN_CREDENTIALS')) {
+      return 'Email ou mot de passe incorrect.';
+    }
+    if (raw.contains('wrong-password')) {
+      return 'Email ou mot de passe incorrect.';
+    }
+    if (raw.contains('too-many-requests')) {
+      return 'Trop de tentatives. Réessaie plus tard.';
     }
 
     return 'Connexion impossible. Réessaie.';
