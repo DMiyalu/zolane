@@ -68,12 +68,28 @@ CREATE TABLE meta (
         }
 
         if (oldVersion < 3) {
-          await db.execute(
-            'ALTER TABLE operations ADD COLUMN rent_month_ms INTEGER',
+          final columns = await db.rawQuery('PRAGMA table_info(operations)');
+          final hasRentMonthColumn = columns.any(
+            (c) => (c['name'] as String?) == 'rent_month_ms',
           );
+
+          if (!hasRentMonthColumn) {
+            await db.execute(
+              'ALTER TABLE operations ADD COLUMN rent_month_ms INTEGER',
+            );
+          }
 
           // Backfill rent month for existing rent income operations.
           // Default assumption: rent month == month of the payment date.
+          // Only runs if the column exists (either previously or just added).
+          final columnsAfter = hasRentMonthColumn
+              ? columns
+              : await db.rawQuery('PRAGMA table_info(operations)');
+          final canBackfill = columnsAfter.any(
+            (c) => (c['name'] as String?) == 'rent_month_ms',
+          );
+          if (!canBackfill) return;
+
           final rows = await db.query(
             'operations',
             columns: ['id', 'occurred_at_ms', 'sync_status'],
