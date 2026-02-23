@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../auth/domain/entities/app_user.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../auth/presentation/pages/account_page.dart';
 import '../../../properties/data/repositories/properties_repository_impl.dart';
 import '../../../properties/domain/entities/property.dart';
 import '../../../properties/presentation/pages/property_detail_page.dart';
@@ -18,16 +19,19 @@ class HomeShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PropertiesCubit(PropertiesRepositoryImpl())..load(),
-      child: _HomeShellView(uid: user.uid),
+      create: (_) => PropertiesCubit(
+        PropertiesRepositoryImpl(),
+        uid: user.uid,
+      )..load(),
+      child: _HomeShellView(user: user),
     );
   }
 }
 
 class _HomeShellView extends StatelessWidget {
-  final String uid;
+  final AppUser user;
 
-  const _HomeShellView({required this.uid});
+  const _HomeShellView({required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +47,17 @@ class _HomeShellView extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Mes biens'),
           actions: [
+            IconButton(
+              tooltip: 'Compte',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => AccountPage(user: user),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.person_outline_rounded),
+            ),
             IconButton(
               tooltip: 'Se déconnecter',
               onPressed: () => context.read<AuthCubit>().signOut(),
@@ -84,7 +99,7 @@ class _HomeShellView extends StatelessWidget {
             };
           },
         ),
-        bottomNavigationBar: SyncRunner(uid: uid),
+        bottomNavigationBar: SyncRunner(uid: user.uid),
       ),
     );
   }

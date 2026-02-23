@@ -22,6 +22,7 @@ extension OperationKindSql on OperationKind {
 
 class Operation {
   final String id;
+  final String userId;
   final String propertyId;
   final OperationKind kind;
   final String category;
@@ -36,6 +37,7 @@ class Operation {
 
   const Operation({
     required this.id,
+    required this.userId,
     required this.propertyId,
     required this.kind,
     required this.category,

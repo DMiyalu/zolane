@@ -18,6 +18,7 @@ class PropertyDetailPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => OperationsCubit(
         OperationsRepositoryImpl(),
+        uid: property.userId,
         propertyId: property.id,
       )..load(),
       child: _PropertyDetailView(property: property),

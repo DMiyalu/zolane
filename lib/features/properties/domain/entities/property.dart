@@ -1,5 +1,6 @@
 class Property {
   final String id;
+  final String userId;
   final String label;
   final String city;
   final String address;
@@ -10,6 +11,7 @@ class Property {
 
   const Property({
     required this.id,
+    required this.userId,
     required this.label,
     required this.city,
     required this.address,

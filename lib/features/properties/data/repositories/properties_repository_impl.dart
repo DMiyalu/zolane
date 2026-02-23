@@ -15,13 +15,17 @@ class PropertiesRepositoryImpl implements PropertiesRepository {
         _uuid = uuid ?? const Uuid();
 
   @override
-  Future<List<Property>> getAll() async {
-    final models = await _local.getAllActive();
+  Future<List<Property>> getAll(String uid) async {
+    // Migrate legacy local data (pre multi-user) to the current account.
+    await _local.claimUnowned(uid);
+
+    final models = await _local.getAllActive(uid);
     return models.map((m) => m.toEntity()).toList(growable: false);
   }
 
   @override
   Future<Property> create({
+    required String uid,
     required String label,
     required String city,
     required String address,
@@ -31,6 +35,7 @@ class PropertiesRepositoryImpl implements PropertiesRepository {
 
     final model = PropertyModel(
       id: _uuid.v4(),
+      userId: uid,
       label: label.trim(),
       city: city.trim(),
       address: address.trim(),
@@ -46,13 +51,14 @@ class PropertiesRepositoryImpl implements PropertiesRepository {
 
   @override
   Future<Property> update({
+    required String uid,
     required String id,
     required String label,
     required String city,
     required String address,
     String? note,
   }) async {
-    final existing = await _local.getById(id);
+    final existing = await _local.getById(uid, id);
     if (existing == null) {
       throw StateError('Property not found');
     }
@@ -60,6 +66,7 @@ class PropertiesRepositoryImpl implements PropertiesRepository {
 
     final updated = PropertyModel(
       id: id,
+      userId: uid,
       label: label.trim(),
       city: city.trim(),
       address: address.trim(),
@@ -74,8 +81,8 @@ class PropertiesRepositoryImpl implements PropertiesRepository {
   }
 
   @override
-  Future<void> delete(String id) async {
+  Future<void> delete(String uid, String id) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    await _local.softDelete(id: id, updatedAtMs: now);
+    await _local.softDelete(uid: uid, id: id, updatedAtMs: now);
   }
 }

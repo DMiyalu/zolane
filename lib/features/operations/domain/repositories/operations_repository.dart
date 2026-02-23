@@ -1,9 +1,13 @@
 import '../entities/operation.dart';
 
 abstract interface class OperationsRepository {
-  Future<List<Operation>> getByProperty(String propertyId);
+  Future<List<Operation>> getByProperty({
+    required String uid,
+    required String propertyId,
+  });
 
   Future<Operation> create({
+    required String uid,
     required String propertyId,
     required OperationKind kind,
     required String category,
@@ -14,6 +18,7 @@ abstract interface class OperationsRepository {
   });
 
   Future<Operation> update({
+    required String uid,
     required String id,
     required String propertyId,
     required OperationKind kind,
@@ -24,5 +29,5 @@ abstract interface class OperationsRepository {
     String? note,
   });
 
-  Future<void> delete(String id);
+  Future<void> delete({required String uid, required String id});
 }

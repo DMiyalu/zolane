@@ -10,7 +10,7 @@ class AppDatabase {
   const AppDatabase._(this.db);
 
   static const _dbName = 'zolane.db';
-  static const _dbVersion = 3;
+  static const _dbVersion = 4;
 
   static Future<AppDatabase> open() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -30,6 +30,7 @@ CREATE TABLE meta (
         await db.execute('''
 CREATE TABLE properties (
   id TEXT PRIMARY KEY,
+  user_id TEXT,
   label TEXT NOT NULL,
   city TEXT NOT NULL,
   address TEXT NOT NULL,
@@ -43,6 +44,7 @@ CREATE TABLE properties (
         await db.execute('''
 CREATE TABLE operations (
   id TEXT PRIMARY KEY,
+  user_id TEXT,
   property_id TEXT NOT NULL,
   kind INTEGER NOT NULL,
   category TEXT NOT NULL,
@@ -118,6 +120,21 @@ CREATE TABLE meta (
               whereArgs: [id],
               conflictAlgorithm: ConflictAlgorithm.abort,
             );
+          }
+        }
+
+        if (oldVersion < 4) {
+          // Add per-user scoping columns (nullable for legacy rows).
+          final propCols = await db.rawQuery('PRAGMA table_info(properties)');
+          final hasPropUserId = propCols.any((c) => (c['name'] as String?) == 'user_id');
+          if (!hasPropUserId) {
+            await db.execute('ALTER TABLE properties ADD COLUMN user_id TEXT');
+          }
+
+          final opCols = await db.rawQuery('PRAGMA table_info(operations)');
+          final hasOpUserId = opCols.any((c) => (c['name'] as String?) == 'user_id');
+          if (!hasOpUserId) {
+            await db.execute('ALTER TABLE operations ADD COLUMN user_id TEXT');
           }
         }
       },

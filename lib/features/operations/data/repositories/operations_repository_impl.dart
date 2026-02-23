@@ -15,8 +15,11 @@ class OperationsRepositoryImpl implements OperationsRepository {
         _uuid = uuid ?? const Uuid();
 
   @override
-  Future<List<Operation>> getByProperty(String propertyId) async {
-    final models = await _local.getByPropertyActive(propertyId);
+  Future<List<Operation>> getByProperty({
+    required String uid,
+    required String propertyId,
+  }) async {
+    final models = await _local.getByPropertyActive(uid: uid, propertyId: propertyId);
     final operations = models
         .map((m) => m.toEntity())
         .toList(growable: true);
@@ -36,6 +39,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
 
   @override
   Future<Operation> create({
+    required String uid,
     required String propertyId,
     required OperationKind kind,
     required String category,
@@ -48,6 +52,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
 
     final model = OperationModel(
       id: _uuid.v4(),
+      userId: uid,
       propertyId: propertyId,
       kind: kind.sqlValue,
       category: category.trim(),
@@ -66,6 +71,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
 
   @override
   Future<Operation> update({
+    required String uid,
     required String id,
     required String propertyId,
     required OperationKind kind,
@@ -75,7 +81,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
     int? rentMonthMs,
     String? note,
   }) async {
-    final existing = await _local.getById(id);
+    final existing = await _local.getById(uid: uid, id: id);
     if (existing == null) {
       throw StateError('Operation not found');
     }
@@ -84,6 +90,7 @@ class OperationsRepositoryImpl implements OperationsRepository {
 
     final updated = OperationModel(
       id: id,
+      userId: uid,
       propertyId: propertyId,
       kind: kind.sqlValue,
       category: category.trim(),
@@ -101,8 +108,8 @@ class OperationsRepositoryImpl implements OperationsRepository {
   }
 
   @override
-  Future<void> delete(String id) async {
+  Future<void> delete({required String uid, required String id}) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    await _local.softDelete(id: id, updatedAtMs: now);
+    await _local.softDelete(uid: uid, id: id, updatedAtMs: now);
   }
 }

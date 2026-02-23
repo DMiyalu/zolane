@@ -8,26 +8,41 @@ import '../models/property_model.dart';
 class PropertiesLocalDataSource {
   Future<AppDatabase> _db() => AppDatabaseProvider.getInstance();
 
-  Future<List<PropertyModel>> getAllActive() async {
+  Future<void> claimUnowned(String uid) async {
+    final database = await _db();
+    await database.db.update(
+      'properties',
+      {'user_id': uid},
+      where: 'user_id IS NULL',
+    );
+
+    await database.db.update(
+      'operations',
+      {'user_id': uid},
+      where: 'user_id IS NULL',
+    );
+  }
+
+  Future<List<PropertyModel>> getAllActive(String uid) async {
     final database = await _db();
 
     final rows = await database.db.query(
       'properties',
-      where: 'sync_status != ?',
-      whereArgs: [SyncStatus.deleted],
+      where: 'user_id = ? AND sync_status != ?',
+      whereArgs: [uid, SyncStatus.deleted],
       orderBy: 'updated_at_ms DESC',
     );
 
     return rows.map(PropertyModel.fromMap).toList(growable: false);
   }
 
-  Future<PropertyModel?> getById(String id) async {
+  Future<PropertyModel?> getById(String uid, String id) async {
     final database = await _db();
 
     final rows = await database.db.query(
       'properties',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'user_id = ? AND id = ?',
+      whereArgs: [uid, id],
       limit: 1,
     );
 
@@ -35,26 +50,26 @@ class PropertiesLocalDataSource {
     return PropertyModel.fromMap(rows.first);
   }
 
-  Future<List<PropertyModel>> getDirty() async {
+  Future<List<PropertyModel>> getDirty(String uid) async {
     final database = await _db();
 
     final rows = await database.db.query(
       'properties',
-      where: 'sync_status = ?',
-      whereArgs: [SyncStatus.dirty],
+      where: 'user_id = ? AND sync_status = ?',
+      whereArgs: [uid, SyncStatus.dirty],
       orderBy: 'updated_at_ms ASC',
     );
 
     return rows.map(PropertyModel.fromMap).toList(growable: false);
   }
 
-  Future<List<PropertyModel>> getDeleted() async {
+  Future<List<PropertyModel>> getDeleted(String uid) async {
     final database = await _db();
 
     final rows = await database.db.query(
       'properties',
-      where: 'sync_status = ?',
-      whereArgs: [SyncStatus.deleted],
+      where: 'user_id = ? AND sync_status = ?',
+      whereArgs: [uid, SyncStatus.deleted],
       orderBy: 'updated_at_ms ASC',
     );
 
@@ -86,13 +101,17 @@ class PropertiesLocalDataSource {
     await database.db.update(
       'properties',
       model.toMap(),
-      where: 'id = ?',
-      whereArgs: [model.id],
+      where: 'user_id = ? AND id = ?',
+      whereArgs: [model.userId, model.id],
       conflictAlgorithm: ConflictAlgorithm.abort,
     );
   }
 
-  Future<void> markSynced({required String id, required int updatedAtMs}) async {
+  Future<void> markSynced({
+    required String uid,
+    required String id,
+    required int updatedAtMs,
+  }) async {
     final database = await _db();
     await database.db.update(
       'properties',
@@ -100,13 +119,17 @@ class PropertiesLocalDataSource {
         'sync_status': SyncStatus.synced,
         'updated_at_ms': updatedAtMs,
       },
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'user_id = ? AND id = ?',
+      whereArgs: [uid, id],
       conflictAlgorithm: ConflictAlgorithm.abort,
     );
   }
 
-  Future<void> softDelete({required String id, required int updatedAtMs}) async {
+  Future<void> softDelete({
+    required String uid,
+    required String id,
+    required int updatedAtMs,
+  }) async {
     final database = await _db();
 
     await database.db.transaction((txn) async {
@@ -116,8 +139,8 @@ class PropertiesLocalDataSource {
           'sync_status': SyncStatus.deleted,
           'updated_at_ms': updatedAtMs,
         },
-        where: 'id = ?',
-        whereArgs: [id],
+        where: 'user_id = ? AND id = ?',
+        whereArgs: [uid, id],
         conflictAlgorithm: ConflictAlgorithm.abort,
       );
 
@@ -128,19 +151,19 @@ class PropertiesLocalDataSource {
           'sync_status': SyncStatus.deleted,
           'updated_at_ms': updatedAtMs,
         },
-        where: 'property_id = ?',
-        whereArgs: [id],
+        where: 'user_id = ? AND property_id = ?',
+        whereArgs: [uid, id],
         conflictAlgorithm: ConflictAlgorithm.abort,
       );
     });
   }
 
-  Future<void> hardDelete(String id) async {
+  Future<void> hardDelete({required String uid, required String id}) async {
     final database = await _db();
     await database.db.delete(
       'properties',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'user_id = ? AND id = ?',
+      whereArgs: [uid, id],
     );
   }
 }

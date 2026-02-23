@@ -1,9 +1,10 @@
 import '../entities/property.dart';
 
 abstract interface class PropertiesRepository {
-  Future<List<Property>> getAll();
+  Future<List<Property>> getAll(String uid);
 
   Future<Property> create({
+    required String uid,
     required String label,
     required String city,
     required String address,
@@ -11,6 +12,7 @@ abstract interface class PropertiesRepository {
   });
 
   Future<Property> update({
+    required String uid,
     required String id,
     required String label,
     required String city,
@@ -18,5 +20,5 @@ abstract interface class PropertiesRepository {
     String? note,
   });
 
-  Future<void> delete(String id);
+  Future<void> delete(String uid, String id);
 }

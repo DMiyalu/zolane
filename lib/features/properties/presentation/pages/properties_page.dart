@@ -7,12 +7,14 @@ import '../widgets/properties_list.dart';
 import '../widgets/property_form_sheet.dart';
 
 class PropertiesPage extends StatelessWidget {
-  const PropertiesPage({super.key});
+  final String uid;
+
+  const PropertiesPage({super.key, required this.uid});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PropertiesCubit(PropertiesRepositoryImpl())..load(),
+      create: (_) => PropertiesCubit(PropertiesRepositoryImpl(), uid: uid)..load(),
       child: const _PropertiesView(),
     );
   }

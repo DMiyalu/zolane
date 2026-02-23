@@ -26,15 +26,20 @@ class OperationsStateError extends OperationsState {
 class OperationsCubit extends Cubit<OperationsState> {
   final OperationsRepository _repository;
   final String _propertyId;
+  final String _uid;
 
-  OperationsCubit(this._repository, {required String propertyId})
-      : _propertyId = propertyId,
+  OperationsCubit(this._repository, {required String uid, required String propertyId})
+      : _uid = uid,
+        _propertyId = propertyId,
         super(const OperationsStateLoading());
 
   Future<void> load() async {
     emit(const OperationsStateLoading());
     try {
-      final operations = await _repository.getByProperty(_propertyId);
+      final operations = await _repository.getByProperty(
+        uid: _uid,
+        propertyId: _propertyId,
+      );
       emit(OperationsStateLoaded(operations));
     } catch (e) {
       emit(OperationsStateError(e.toString()));
@@ -51,6 +56,7 @@ class OperationsCubit extends Cubit<OperationsState> {
   }) async {
     try {
       await _repository.create(
+        uid: _uid,
         propertyId: _propertyId,
         kind: kind,
         category: category,
@@ -76,6 +82,7 @@ class OperationsCubit extends Cubit<OperationsState> {
   }) async {
     try {
       await _repository.update(
+        uid: _uid,
         id: id,
         propertyId: _propertyId,
         kind: kind,
@@ -93,7 +100,7 @@ class OperationsCubit extends Cubit<OperationsState> {
 
   Future<void> delete(String id) async {
     try {
-      await _repository.delete(id);
+      await _repository.delete(uid: _uid, id: id);
       await load();
     } catch (e) {
       emit(OperationsStateError(e.toString()));

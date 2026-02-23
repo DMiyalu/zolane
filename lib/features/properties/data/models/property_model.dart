@@ -2,6 +2,7 @@ import '../../domain/entities/property.dart';
 
 class PropertyModel {
   final String id;
+  final String userId;
   final String label;
   final String city;
   final String address;
@@ -12,6 +13,7 @@ class PropertyModel {
 
   const PropertyModel({
     required this.id,
+    required this.userId,
     required this.label,
     required this.city,
     required this.address,
@@ -24,6 +26,7 @@ class PropertyModel {
   factory PropertyModel.fromMap(Map<String, Object?> map) {
     return PropertyModel(
       id: map['id'] as String,
+      userId: (map['user_id'] as String?) ?? '',
       label: map['label'] as String,
       city: map['city'] as String,
       address: map['address'] as String,
@@ -37,6 +40,7 @@ class PropertyModel {
   Map<String, Object?> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'label': label,
       'city': city,
       'address': address,
@@ -50,6 +54,7 @@ class PropertyModel {
   Property toEntity() {
     return Property(
       id: id,
+      userId: userId,
       label: label,
       city: city,
       address: address,

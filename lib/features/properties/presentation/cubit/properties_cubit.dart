@@ -25,13 +25,16 @@ class PropertiesStateError extends PropertiesState {
 
 class PropertiesCubit extends Cubit<PropertiesState> {
   final PropertiesRepository _repository;
+  final String _uid;
 
-  PropertiesCubit(this._repository) : super(const PropertiesStateLoading());
+  PropertiesCubit(this._repository, {required String uid})
+      : _uid = uid,
+        super(const PropertiesStateLoading());
 
   Future<void> load() async {
     emit(const PropertiesStateLoading());
     try {
-      final properties = await _repository.getAll();
+      final properties = await _repository.getAll(_uid);
       emit(PropertiesStateLoaded(properties));
     } catch (e) {
       emit(PropertiesStateError(e.toString()));
@@ -46,6 +49,7 @@ class PropertiesCubit extends Cubit<PropertiesState> {
   }) async {
     try {
       await _repository.create(
+        uid: _uid,
         label: label,
         city: city,
         address: address,
@@ -66,6 +70,7 @@ class PropertiesCubit extends Cubit<PropertiesState> {
   }) async {
     try {
       await _repository.update(
+        uid: _uid,
         id: id,
         label: label,
         city: city,
@@ -80,7 +85,7 @@ class PropertiesCubit extends Cubit<PropertiesState> {
 
   Future<void> delete(String id) async {
     try {
-      await _repository.delete(id);
+      await _repository.delete(_uid, id);
       await load();
     } catch (e) {
       emit(PropertiesStateError(e.toString()));

@@ -2,6 +2,7 @@ import '../../domain/entities/operation.dart';
 
 class OperationModel {
   final String id;
+  final String userId;
   final String propertyId;
   final int kind;
   final String category;
@@ -15,6 +16,7 @@ class OperationModel {
 
   const OperationModel({
     required this.id,
+    required this.userId,
     required this.propertyId,
     required this.kind,
     required this.category,
@@ -30,6 +32,7 @@ class OperationModel {
   factory OperationModel.fromMap(Map<String, Object?> map) {
     return OperationModel(
       id: map['id'] as String,
+      userId: (map['user_id'] as String?) ?? '',
       propertyId: map['property_id'] as String,
       kind: (map['kind'] as num).toInt(),
       category: map['category'] as String,
@@ -46,6 +49,7 @@ class OperationModel {
   Map<String, Object?> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'property_id': propertyId,
       'kind': kind,
       'category': category,
@@ -62,6 +66,7 @@ class OperationModel {
   Operation toEntity() {
     return Operation(
       id: id,
+      userId: userId,
       propertyId: propertyId,
       kind: OperationKindSql.fromSqlValue(kind),
       category: category,

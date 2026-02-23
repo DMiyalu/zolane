@@ -53,7 +53,7 @@ class SyncService {
 
   Future<void> _pushLocal(String uid, {required void Function(int) onProcessed}) async {
     // Push creates/updates first so remote has the base documents.
-    final propertiesDirty = await _propertiesLocal.getDirty();
+    final propertiesDirty = await _propertiesLocal.getDirty(uid);
     for (final p in propertiesDirty) {
       await _propertiesRef(uid).doc(p.id).set(
         {
@@ -62,6 +62,7 @@ class SyncService {
           'city': p.city,
           'address': p.address,
           'note': p.note,
+          'user_id': uid,
           'created_at_ms': p.createdAtMs,
           'updated_at_ms': p.updatedAtMs,
           'deleted': false,
@@ -69,11 +70,11 @@ class SyncService {
         SetOptions(merge: true),
       );
 
-      await _propertiesLocal.markSynced(id: p.id, updatedAtMs: p.updatedAtMs);
+      await _propertiesLocal.markSynced(uid: uid, id: p.id, updatedAtMs: p.updatedAtMs);
       onProcessed(p.updatedAtMs);
     }
 
-    final operationsDirty = await _operationsLocal.getDirty();
+    final operationsDirty = await _operationsLocal.getDirty(uid);
     for (final op in operationsDirty) {
       await _operationsRef(uid).doc(op.id).set(
         {
@@ -85,6 +86,7 @@ class SyncService {
           'note': op.note,
           'occurred_at_ms': op.occurredAtMs,
           'rent_month_ms': op.rentMonthMs,
+          'user_id': uid,
           'created_at_ms': op.createdAtMs,
           'updated_at_ms': op.updatedAtMs,
           'deleted': false,
@@ -92,12 +94,12 @@ class SyncService {
         SetOptions(merge: true),
       );
 
-      await _operationsLocal.markSynced(id: op.id, updatedAtMs: op.updatedAtMs);
+      await _operationsLocal.markSynced(uid: uid, id: op.id, updatedAtMs: op.updatedAtMs);
       onProcessed(op.updatedAtMs);
     }
 
     // Push operation tombstones BEFORE property hard-delete cascades remove them locally.
-    final operationsDeleted = await _operationsLocal.getDeleted();
+    final operationsDeleted = await _operationsLocal.getDeleted(uid);
     for (final op in operationsDeleted) {
       await _operationsRef(uid).doc(op.id).set(
         {
@@ -108,12 +110,12 @@ class SyncService {
         SetOptions(merge: true),
       );
 
-      await _operationsLocal.hardDelete(op.id);
+      await _operationsLocal.hardDelete(uid: uid, id: op.id);
       onProcessed(op.updatedAtMs);
     }
 
     // Finally push property tombstones and then cleanup locally.
-    final propertiesDeleted = await _propertiesLocal.getDeleted();
+    final propertiesDeleted = await _propertiesLocal.getDeleted(uid);
     for (final p in propertiesDeleted) {
       await _propertiesRef(uid).doc(p.id).set(
         {
@@ -124,7 +126,7 @@ class SyncService {
         SetOptions(merge: true),
       );
 
-      await _propertiesLocal.hardDelete(p.id);
+      await _propertiesLocal.hardDelete(uid: uid, id: p.id);
       onProcessed(p.updatedAtMs);
     }
   }
@@ -146,22 +148,34 @@ class SyncService {
       onProcessed(updatedAtMs);
 
       final deleted = (data['deleted'] == true);
-      final local = await _propertiesLocal.getById(doc.id);
+      final local = await _propertiesLocal.getById(uid, doc.id);
 
       if (local != null && local.updatedAtMs > updatedAtMs) {
         continue;
       }
 
       if (deleted) {
-        await _propertiesLocal.hardDelete(doc.id);
+        await _propertiesLocal.hardDelete(uid: uid, id: doc.id);
         continue;
       }
 
       final model = _propertyFromRemote(doc.id, data);
       if (model == null) continue;
 
-      await _propertiesLocal.upsert(model);
-      await _propertiesLocal.markSynced(id: model.id, updatedAtMs: model.updatedAtMs);
+      final scoped = PropertyModel(
+        id: model.id,
+        userId: uid,
+        label: model.label,
+        city: model.city,
+        address: model.address,
+        note: model.note,
+        createdAtMs: model.createdAtMs,
+        updatedAtMs: model.updatedAtMs,
+        syncStatus: model.syncStatus,
+      );
+
+      await _propertiesLocal.upsert(scoped);
+      await _propertiesLocal.markSynced(uid: uid, id: scoped.id, updatedAtMs: scoped.updatedAtMs);
     }
 
     final opSnap = await _operationsRef(uid)
@@ -176,7 +190,7 @@ class SyncService {
       onProcessed(updatedAtMs);
 
       final deleted = (data['deleted'] == true);
-      final local = await _operationsLocal.getById(doc.id);
+      final local = await _operationsLocal.getById(uid: uid, id: doc.id);
 
       final localUpdatedAt = local?.updatedAtMs;
       if (localUpdatedAt != null && localUpdatedAt > updatedAtMs) {
@@ -184,20 +198,35 @@ class SyncService {
       }
 
       if (deleted) {
-        await _operationsLocal.hardDelete(doc.id);
+        await _operationsLocal.hardDelete(uid: uid, id: doc.id);
         continue;
       }
 
       final model = _operationFromRemote(doc.id, data);
       if (model == null) continue;
 
+      final scoped = OperationModel(
+        id: model.id,
+        userId: uid,
+        propertyId: model.propertyId,
+        kind: model.kind,
+        category: model.category,
+        amountCents: model.amountCents,
+        note: model.note,
+        occurredAtMs: model.occurredAtMs,
+        rentMonthMs: model.rentMonthMs,
+        createdAtMs: model.createdAtMs,
+        updatedAtMs: model.updatedAtMs,
+        syncStatus: model.syncStatus,
+      );
+
       // Skip operations that reference a property not present locally
       // (prevents foreign key errors). Properties are pulled first.
-      final hasProperty = await _propertiesLocal.getById(model.propertyId);
+      final hasProperty = await _propertiesLocal.getById(uid, scoped.propertyId);
       if (hasProperty == null) continue;
 
-      await _operationsLocal.upsert(model);
-      await _operationsLocal.markSynced(id: model.id, updatedAtMs: model.updatedAtMs);
+      await _operationsLocal.upsert(scoped);
+      await _operationsLocal.markSynced(uid: uid, id: scoped.id, updatedAtMs: scoped.updatedAtMs);
     }
   }
 
@@ -214,6 +243,7 @@ class SyncService {
 
     return PropertyModel(
       id: id,
+      userId: (data['user_id'] as String?) ?? '',
       label: label,
       city: city,
       address: address,
@@ -244,6 +274,7 @@ class SyncService {
 
     return OperationModel(
       id: id,
+      userId: (data['user_id'] as String?) ?? '',
       propertyId: propertyId,
       kind: kind,
       category: category,
